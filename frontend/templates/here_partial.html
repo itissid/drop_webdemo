@@ -1,0 +1,122 @@
+{% extends "here_base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock head %}
+{% block content %}
+
+<div class="swiper-container p-3">
+    {% if no_events != True %}
+    {% for mood, events in events_by_mood.items() %}
+    <div class="swiper {{when}}-{{ loop.index }}"> <!-- -->
+        <div> {{mood}} </div>
+        <div class="swiper-wrapper {{when}}">
+            {% set outer_loop = loop %}
+            {% for event in events %}
+            <div class="swiper-slide {{when}}">
+                <div class="card bg-light">
+                    <div class="card-header">{{event.submood}}</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{event.name | truncate(40, killwords=False, end='...')}} </h5>
+                        <p class="card-text">{{event.description | truncate(40, killwords=False, end='...')}}
+                        </p>
+                        <div class="card-footer bg-transparent">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-1">
+                                        <button type="button" class="btn btn-default btn-lg fa fa-info-circle"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#detailModal-{{outer_loop.index}}-{{loop.index}}">
+                                            <!-- <i class="fa fa-info-circle" aria-hidden="true"></i> -->
+                                        </button>
+                                    </div>
+                                    <div class="col-2 ms-auto pt-1">
+                                        {% for link in event.links %}
+                                        <a href="{{link}}" target="_blank" rel="noopener noreferrer"
+                                            class="link-primary float-end fa fa-external-link-square p-1"></a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content for each swiper from template variables. -->
+            </div>
+
+            {% endfor %}
+        </div>
+        <!-- Add Pagination -->
+        <div class="swiper-button-next {{when}}"></div>
+        <div class="swiper-button-prev {{when}}"></div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="row">
+        <div class="col text-center">
+            <h1>Nothing to do here.</h1>
+        </div>
+    {% endif %}
+
+    {% for mood, events in events_by_mood.items() %}
+    {% set outer_loop = loop %}
+    {% for event in events %}
+    <div class="modal fade" id="detailModal-{{outer_loop.index}}-{{loop.index}}" tabindex="-1"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{ event.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if event.addresses %}
+                    <h6 class="card-subtitle mb-2 text-muted">Where?</h6>
+                    <ul class="list-group list-group-flush">
+                        {% for address in event.addresses %}
+                        <li class="list-group-item">{{address}}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        What?
+                    </h6>
+                    {{event.description}}
+                </div>
+                <div class="modal-footer row">
+                    <div class="container-fluid">
+
+                        <div class="col">
+                            {{event.mini_summary}}
+                        </div>
+                        <div class="col ms-auto">
+                            {% for link in event.links %}
+                            <a href="{{link}}" target="_blank" rel="noopener noreferrer"
+                                class="link-primary float-end fa fa-external-link-square p-1"></a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>
+<script>
+    {% for i in range(0, events_by_mood | length) %}
+    const swiper{{ loop.index }} = new Swiper('.swiper.{{when}}-{{loop.index}}', {
+        slidesPerView: "auto",
+        spaceBetween: 40,
+        navigation: {
+            nextEl: ".swiper-button-next.{{when}}",
+            prevEl: ".swiper-button-prev.{{when}}",
+        },
+    });
+    {% endfor %}
+</script>
+{% endblock content %}
+{% block footer %}
+{% endblock footer %}

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "y"
+version = "y"
+description = "Demo of Approximate Retrieval capability of LLMs appplied to build a product for Mindful Exploration of Urban Events."
+authors = ["y"]
+license = "CC BY NC"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "y"
+fastapi = "^0.104.1"
+Jinja2 = "^3.1.2"
+SQLAlchemy = "^2.0.22"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

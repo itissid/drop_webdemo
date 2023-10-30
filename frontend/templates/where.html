@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mapbox/leaflet-pip@1.1.0/leaflet-pip.min.js "></script>
+    <script src="https://unpkg.com/leaflet.snogylop"></script>
+    <script src="/static/js/scripts.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container-fluid vh-100 d-flex flex-column justify-content-center">
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <div id="map-container">
+                    <div id="mapid"></div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col text-center">
+                Drop a pin where you would be.
+            </div>
+        </div>
+
+        <div id="alert" class="alert alert-warning alert-dismissible fade" role="alert" style="display:none;">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div id="error" class="alert alert-danger hidden" role="alert"></div>
+        <footer class="footer text-center py-3"
+            style="position: fixed; bottom: 0; width: 100%; background-color: #f8f9fa;">
+            <div class="container">
+                <span class="text-muted" style="font-size: 14px;"> No matter how you got there, its where
+                    you are now.
+                </span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const boundary_geo_json = JSON.parse('{{ boundary_geo_json_str | safe }}');
+        var mymap = L.map('mapid').setView([40.736755, -74.059015], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            maxZoom: 19,
+        }).addTo(mymap);
+
+        // TODO: Add a note to say where the demo is active.
+        L.geoJson(boundary_geo_json, {
+            invert: true,
+
+        }).addTo(mymap);
+
+        var boundaryStyle = {
+            color: "gray", // Replace 'your-color' with your preferred color
+            weight: 5,           // Width of the boundary line
+            opacity: 0.5,          // Opacity of the boundary line
+            fill: false          // This prevents the interior from being filled
+        };
+
+        var boundaryLayer = L.geoJson(boundary_geo_json, {
+            style: boundaryStyle
+        }).addTo(mymap);
+
+        var marker;
+        mymap.on('click', function (e) {
+            if (marker) {
+                mymap.removeLayer(marker);
+            }
+            marker = L.marker(e.latlng).addTo(mymap);
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+            var layers = leafletPip.pointInLayer([lng, lat], boundaryLayer, true);
+            if (layers.length > 0) {
+                // The point is within the boundary
+                hideAlert();
+                areYouHere(lat, lng)
+            } else {
+                // The point is outside the boundary
+                showAlert('The selected location is outside the allowed area.');
+            }
+
+        });
+    </script>
+</body>
