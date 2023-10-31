@@ -25,11 +25,4 @@ __pycache__/
 *.code-workspace
 pyvenv.cfg
 .python-version
-examples/experimental/*
-notebooks/blip2_instructed_generation.ipynb
-notebooks/*
-examples/*
-drop_backend/utils/ai_adhoc.py
-drop_backend/utils/scratch.py
-geodata/
 **/.DS_Store

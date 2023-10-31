@@ -1,18 +1,29 @@
 [tool.poetry]
-name = "y"
-version = "y"
+name = "drop_webdemo"
+version = "0.1.0"
 description = "Demo of Approximate Retrieval capability of LLMs appplied to build a product for Mindful Exploration of Urban Events."
-authors = ["y"]
+authors = ["Sid <itissid@gmail.com>"]
 license = "CC BY NC"
 readme = "README.md"
+packages = [{include = "herenow_demo", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "y"
-fastapi = "^0.104.1"
+python = "^3.8"
+fastapi = "^0.103.0"
 Jinja2 = "^3.1.2"
-SQLAlchemy = "^2.0.22"
+SQLAlchemy = "^2.0.18"
+mypy = "^1.6.1"
+shapely = "^2.0.2"
+drop = {path = "../drop/", develop = true}
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.setuptools]
+py-modules = ["drop_backend"]
+
+[tool.poetry.scripts]
+herenow_demo = "herenow_demo.main:run"

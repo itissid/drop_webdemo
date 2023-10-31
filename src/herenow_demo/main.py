@@ -1,12 +1,11 @@
-import enum
 import json
 import logging
-import sys
 from collections import defaultdict
 from datetime import datetime
 from typing import Optional, Union
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,11 +14,7 @@ from shapely.geometry import Point, Polygon
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from starlette.middleware.sessions import SessionMiddleware
-from .utils.constants import boundary_geo_json
 
-sys.path.append(
-    "/Users/sid/workspace/drop/"
-)  # I need to install drop and then run the webdemo as its own project to get rid of this hackery.
 from drop_backend.commands.webdemo_command_helper import (
     TaggedEvent,
     geotag_moodtag_events_helper,
@@ -32,6 +27,11 @@ from drop_backend.utils.ors import (
     TransitDirectionError,
     TransitDirectionSummary,
 )
+from .utils.constants import boundary_geo_json
+
+# sys.path.append(
+#     "/Users/sid/workspace/drop/"
+# )  # I need to install drop and then run the webdemo as its own project to get rid of this hackery.
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
@@ -43,16 +43,14 @@ app.add_middleware(
         "http://localhost:8000",
     ],  # Allows requests only from "https://example.com"
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
+    allow_methods=["GET"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
 app.add_middleware(SessionMiddleware, secret_key="my-secret-key")
 
-templates = Jinja2Templates(directory="../../frontend/templates")
+templates = Jinja2Templates(directory="src/herenow_demo/templates")
 
-app.mount(
-    "/static", StaticFiles(directory="../../frontend/static"), name="static"
-)
+app.mount("/static", StaticFiles(directory="src/herenow_demo/static"), name="static")
 NOW_WINDOW_HOURS = 1  # Make this a const
 _engine: Engine
 
@@ -79,7 +77,7 @@ async def where(request: Request):
 
 
 @app.get("/presence/are_you_really_here", response_class=HTMLResponse)
-async def validate(lat: float = None, long: float = None):
+async def validate(lat: Optional[float] = None, long: Optional[float] = None):
     if _is_where_you_are_valid(lat, long):
         return "Ok"
     raise HTTPException(
@@ -127,9 +125,7 @@ async def here(
         events_by_mood = defaultdict(list)
 
         def get_directions_obj(
-            directions: Union[
-                TransitDirectionError, TransitDirectionSummary, None
-            ]
+            directions: Union[TransitDirectionError, TransitDirectionSummary, None]
         ):
             if isinstance(directions, TransitDirectionError):
                 return None
@@ -213,7 +209,8 @@ async def here(
             "request": request,
             "when": when.value,
             "events_by_mood": events_by_mood,
-            "no_events": len(filtered_events) == 0,  # Flag to indicate whether there are events or not
+            "no_events": len(filtered_events)
+            == 0,  # Flag to indicate whether there are events or not
         }
         return templates.TemplateResponse("here_partial.html", template_data)
     raise HTTPException(
@@ -222,40 +219,40 @@ async def here(
     )
 
 
-def _is_where_you_are_valid(
-    lat: Optional[float], long: Optional[float]
-) -> bool:
+def _is_where_you_are_valid(lat: Optional[float], long: Optional[float]) -> bool:
     if not lat or not long:
         return False
     point = Point(long, lat)  # Note: Shapely uses (lng, lat) order
-    boundary_coords = boundary_geo_json["features"][0]["geometry"][
-        "coordinates"
-    ][0]
+    boundary_coords = boundary_geo_json["features"][0]["geometry"]["coordinates"][0]
     boundary = Polygon(boundary_coords)
     if boundary.contains(point):
         print("You are here.")
         return True
     return False
 
-
+# TODO: replace with a non hardcoded path.
+SQLLITE_PATH = "sqlite:////Users/sid/workspace/drop/drop.db"
 def init_db():
     print("Initating DB")
-    # TODO: replace with a non hardcoded path.
-    url = "sqlite:////Users/sid/workspace/drop/drop.db"
+
 
     global _engine
-    _engine = create_engine(url)  # Create new DB
+    _engine = create_engine(
+        SQLLITE_PATH, connect_args={"check_same_thread": False}
+    )  # Create new DB
     bind_engine(_engine)
     print("Initalized DB")
 
 
-@app.on_event("startup")
-async def startup_event():
+def run():
+    # import uvicorn
+
     init_db()
+    # NOTE that usually we can pass the app object directly to uvicorn.run
+    # but
+    # TODO: remove reload in production.
+    # uvicorn.run("herenow_demo.main:app", host="0.0.0.0", port=8000, reload=True)
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    init_db()
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    run()

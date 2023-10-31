@@ -1,20 +1,51 @@
 # Use an official Python runtime as a base image
-FROM python:3.8-slim-buster
+FROM python:3.9-slim-buster
 
-# Set the working directory in the container to /app
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Install poetry
+RUN pip install poetry
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Arguments to determine if projects should be installed from GitHub
+ARG INSTALL_DROP_BACKEND_FROM_GITHUB=false
+ARG INSTALL_HERENOW_FROM_GITHUB=false
+ARG REPO_DROP_BACKEND_URL=https://github.com/itissid/drop_PoT.git
+ARG REPO_B_URL=https://github.com/itissid/projectB.git
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+# Copy local projects to container
+COPY ./path_to_projectA_on_host /app/projectA
+COPY ./path_to_projectB_on_host /app/projectB
 
-# Define environment variable
-ENV NAME World
+# Install Project B
+RUN if [ "$INSTALL_B_FROM_GITHUB" = "true" ]; then \
+        git clone $REPO_B_URL /app/projectB && \
+        cd /app/projectB && \
+        poetry install; \
+    else \
+        cd /app/projectB && \
+        poetry install; \
+    fi
 
-# Run app.py when the container launches
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
+# Install Project A
+RUN if [ "$INSTALL_A_FROM_GITHUB" = "true" ]; then \
+        git clone $REPO_A_URL /app/projectA && \
+        cd /app/projectA && \
+        poetry install; \
+    else \
+        cd /app/projectA && \
+        poetry install; \
+    fi
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Set the command to run your application
+CMD ["uvicorn", "projectA.main:app", "--host", "0.0.0.0", "--port", "8000"]
