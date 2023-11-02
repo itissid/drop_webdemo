@@ -8,14 +8,22 @@ readme = "README.md"
 packages = [{include = "herenow_demo", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 fastapi = "^0.103.0"
 Jinja2 = "^3.1.2"
-SQLAlchemy = "^2.0.18"
-mypy = "^1.6.1"
+SQLAlchemy = "2.0.18"
 shapely = "^2.0.2"
+gunicorn = "^21.2.0"
+uvicorn = "^0.23.2"
+itsdangerous = "^2.1.2"
+python-dotenv = "^1.0.0"
+
+
+[tool.poetry.group.backend.dependencies]
 drop = {path = "../drop/", develop = true}
 
+[tool.poetry.group.tools.dependencies]
+mypy = "^1.6.1"
 
 [build-system]
 requires = ["poetry-core"]

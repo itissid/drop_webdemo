@@ -1,6 +1,5 @@
 # Ignore local environment files
 .idea
-.py
 .env
 
 # Ignore Python virtual environment folders
@@ -19,11 +18,12 @@ __pycache__/
 *.sql
 # Ignore database files
 *.db
+*.whl
 
 # Ignore VSCode specific files
 .vscode/
 *.code-workspace
 pyvenv.cfg
 .python-version
-**/.DS_Store
+geodata
 dist/
