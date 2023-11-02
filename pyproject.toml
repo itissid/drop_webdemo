@@ -5,7 +5,7 @@ description = "Demo of Approximate Retrieval capability of LLMs appplied to buil
 authors = ["Sid <itissid@gmail.com>"]
 license = "CC BY NC"
 readme = "README.md"
-packages = [{include = "herenow_demo", from = "src"}]
+packages = [{ include = "herenow_demo", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -16,14 +16,16 @@ shapely = "^2.0.2"
 gunicorn = "^21.2.0"
 uvicorn = "^0.23.2"
 itsdangerous = "^2.1.2"
+mypy = {version = "^1.6.1", optional = true}
 python-dotenv = "^1.0.0"
+drop_backend = { git = "https://github.com/itissid/Drop-PoT.git", tag = "v1.0.4" }
+
+# [tool.poetry.group.backend.dependencies]
+# drop = {path = "../drop/", develop = true}
 
 
-[tool.poetry.group.backend.dependencies]
-drop = {path = "../drop/", develop = true}
-
-[tool.poetry.group.tools.dependencies]
-mypy = "^1.6.1"
+[tool.poetry.extras]
+quality = ["mypy"]
 
 [build-system]
 requires = ["poetry-core"]

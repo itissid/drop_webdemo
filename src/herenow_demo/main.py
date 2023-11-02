@@ -5,7 +5,6 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Optional, Union
 
-from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -31,13 +30,9 @@ from drop_backend.utils.ors import (
 from dotenv import load_dotenv
 from .utils.constants import boundary_geo_json
 
-# sys.path.append(
-#     "/Users/sid/workspace/drop/"
-# )  # I need to install drop and then run the webdemo as its own project to get rid of this hackery.
-
 load_dotenv()
 ALLOWED_ORIGINS = os.environ.get("ALLOWD_ORIGINS", "").strip().split(",")
-SQLLITE_PATH = os.environ.get("SQLITE_DB_PATH", "").strip()
+SQLLITE_DB_PATH = os.environ.get("SQLITE_DB_PATH", "").strip()
 NOW_WINDOW_HOURS = int(
     os.environ.get("NOW_WINDOW_HOURS", "1").strip()
 )  # Make this a const
@@ -48,7 +43,7 @@ ORS_API_ENDPOINT = os.environ.get("ORS_API_ENDPOINT", "").strip()
 assert ALLOWED_ORIGINS and isinstance(
     ALLOWED_ORIGINS, list
 ), "Allowed origins not set or wrong"
-assert SQLLITE_PATH, "SQLLITE_PATH not set"
+assert SQLLITE_DB_PATH, "SQLLITE_DB_PATH not set"
 assert SECRET_KEY, "SECRET_KEY not set"
 assert ORS_API_ENDPOINT, "ORS_API_ENDPOINT not set"
 
@@ -144,7 +139,7 @@ async def here(
         # Pass lat long, when to the backend method to get the data.
         filtered_events = geotag_moodtag_events_helper(
             _engine,
-            ors_api_endpoint=ORS_API_ENDPOINT,
+            ORS_API_ENDPOINT,
             filename="hobokengirl_com_hoboken_jersey_city_events_september_1_2023_20230913_160012_a.txt_postprocessed",
             version="v1",
             where_lat=lat,
@@ -262,12 +257,9 @@ def _is_where_you_are_valid(lat: Optional[float], long: Optional[float]) -> bool
     return False
 
 
-# TODO: replace with a non hardcoded path.
-
-
 def init_db():
     logger.info("Initating DB")
-    _engine = create_engine(SQLLITE_PATH, connect_args={"check_same_thread": False})
+    _engine = create_engine(SQLLITE_DB_PATH, connect_args={"check_same_thread": False})
     bind_engine(_engine)
     logger.info("Initalized DB")
     return _engine

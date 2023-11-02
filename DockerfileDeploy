@@ -1,0 +1,33 @@
+# For deploying  fully built docker to a container.
+FROM python:3.10-slim as base
+
+ARG SQLITE_DB_PATH
+ARG RELOAD_WEBAPP
+ARG SECRET_KEY
+ARG ORS_API_ENDPOINT
+ARG ALLOWED_ORIGINS
+ARG DEPLOY_TAG
+
+ENV SQLITE_DB_PATH=${SQLITE_DB_PATH} \
+    RELOAD_WEBAPP=${RELOAD_WEBAPP} \
+    SECRET_KEY=${SECRET_KEY} \
+    ORS_API_ENDPOINT=${ORS_API_ENDPOINT} \
+    ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git gcc g++ git sqlite3 musl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PIP_DEFAULT_TIMEOUT=100 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    POETRY_VERSION=1.5.1 
+
+RUN pip install git+https://github.com/itissid/drop_webdemo.git@${DEPLOY_TAG}
+
+EXPOSE 8000
+WORKDIR /app
+COPY drop.db /app/drop.db
+
+ENTRYPOINT ["gunicorn", "herenow_demo.main:app"]
+CMD ["--bind", "0.0.0.0:8000", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker"]

@@ -1,0 +1,50 @@
+FROM python:3.10-slim as base
+ARG DROP_BACKEND_DIR
+ARG DROP_DEMO_DIR
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# I was worried about how to get the poetry version for the python version that is installed in the base image.
+# Turns out I can get the poetry version for the given python version that is
+# installed per https://python-poetry.org/docs/managing-environments/
+ENV PIP_DEFAULT_TIMEOUT=100 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    POETRY_VERSION=1.5.1 
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git gcc g++ git sqlite3 musl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Experimenting with alpine
+# RUN apk add --no-cache --virtual .build-deps \
+#     openssl-dev openssl gcc g++ git sqlite  linux-headers musl-dev libffi-dev geos-dev cargo curl automake\
+#     && rm -rf /var/lib/apt/lists/* 
+RUN pip3 install "poetry==$POETRY_VERSION"
+
+COPY ${DROP_BACKEND_DIR}/pyproject.toml /backend/
+COPY ${DROP_BACKEND_DIR}/poetry.lock /backend/
+WORKDIR /backend
+RUN touch README.md
+COPY ${DROP_BACKEND_DIR}/src /backend/src
+RUN poetry check
+RUN poetry build
+RUN pip install /backend/dist/*.whl
+# TODO: export using poetry from docker container?
+
+
+# RUN python -m venv /app/venv
+# Install dependencies for ${DROP_DEMO_DIR}
+WORKDIR /app
+COPY ${DROP_DEMO_DIR}/pyproject.toml /app/
+COPY ${DROP_DEMO_DIR}/poetry.lock /app/
+RUN touch README.md
+COPY ${DROP_DEMO_DIR}/src /app/src
+RUN poetry check
+RUN poetry build
+RUN pip install /app/dist/*.whl
+# TODO: export using poetry from docker container?
+
+EXPOSE 8000
+
+FROM base as final
