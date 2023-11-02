@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "drop_webdemo"
+name = "herenow_demo"
 version = "0.1.0"
 description = "Demo of Approximate Retrieval capability of LLMs appplied to build a product for Mindful Exploration of Urban Events."
 authors = ["Sid <itissid@gmail.com>"]
@@ -20,9 +20,6 @@ mypy = {version = "^1.6.1", optional = true}
 python-dotenv = "^1.0.0"
 drop_backend = { git = "https://github.com/itissid/Drop-PoT.git", tag = "v1.0.4" }
 
-# [tool.poetry.group.backend.dependencies]
-# drop = {path = "../drop/", develop = true}
-
 
 [tool.poetry.extras]
 quality = ["mypy"]
@@ -31,9 +28,6 @@ quality = ["mypy"]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-
-[tool.setuptools]
-py-modules = ["drop_backend"]
 
 [tool.poetry.scripts]
 herenow_demo = "herenow_demo.main:run"

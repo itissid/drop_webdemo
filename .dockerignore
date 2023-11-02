@@ -17,7 +17,6 @@ __pycache__/
 *.tmp
 *.sql
 # Ignore database files
-*.db
 *.whl
 
 # Ignore VSCode specific files

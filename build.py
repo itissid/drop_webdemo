@@ -8,7 +8,7 @@ import subprocess
 
 # Initialize argument parser
 parser = ArgumentParser(
-    description="Prepare and build Docker image for drop_PoT and drop_webdemo projects."
+    description="Prepare and build Docker image for drop_PoT and herenow_demo projects."
 )
 parser.add_argument(
     "--pot-source",
@@ -20,7 +20,7 @@ parser.add_argument(
     "--demo-source",
     choices=["github", "local"],
     required=True,
-    help="Source to fetch drop_webdemo from: github or local.",
+    help="Source to fetch herenow_demo from: github or local.",
 )
 parser.add_argument(
     "--pot-dir",
@@ -32,7 +32,7 @@ parser.add_argument(
     "--demo-dir",
     required=True,
     type=str,
-    help="Local directory of drop_webdemo if source is local.",
+    help="Local directory of herenow_demo if source is local.",
 )
 parser.add_argument(
     "--pot-tag",
@@ -42,7 +42,7 @@ parser.add_argument(
 parser.add_argument(
     "--demo-tag",
     type=str,
-    help="Tagged version of drop_webdemo to clone if source is github.",
+    help="Tagged version of herenow_demo to clone if source is github.",
 )
 
 print("Argument parser setup done.")
@@ -142,8 +142,8 @@ def main():
             args.pot_source, local_dropbackend_dir, args.pot_dir, args.pot_tag, temp_dir
         )
 
-    # Clone or copy drop_webdemo project
-    local_drop_demo_dir = "drop_webdemo"
+    # Clone or copy herenow_demo project
+    local_drop_demo_dir = "herenow_demo"
     if args.demo_source:
         clone_or_copy_project_with_ignore(
             args.demo_source,
@@ -153,7 +153,7 @@ def main():
             temp_dir,
         )
 
-    # Update pyproject.toml in drop_webdemo project
+    # Update pyproject.toml in herenow_demo project
 
     # update_pyproject_toml(os.path.join(temp_dir, local_drop_demo_dir))
 
@@ -165,7 +165,7 @@ def main():
                 "docker",
                 "build",
                 "-t",
-                "drop_webdemo",
+                "herenow_demo",
                 "--build-arg",
                 f"DROP_BACKEND_DIR={local_dropbackend_dir}",
                 "--build-arg",
@@ -176,13 +176,13 @@ def main():
             ]
         ),
     )
-    # print('Building Docker image "drop_webdemo" ...')
+    # print('Building Docker image "herenow_demo" ...')
     # subprocess.run(
     #     [
     #         "docker",
     #         "build",
     #         "-t",
-    #         "drop_webdemo",
+    #         "herenow_demo",
     #         "--no-cache",
     #         "--build-arg",
     #         f"DROP_BACKEND_DIR={local_dropbackend_dir}",

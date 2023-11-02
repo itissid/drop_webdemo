@@ -1,6 +1,6 @@
 FROM python:3.10-slim as base
 ARG DROP_BACKEND_DIR
-ARG DROP_DEMO_DIR
+ARG HERENOW_DEMO_DIR
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -32,19 +32,18 @@ RUN poetry build
 RUN pip install /backend/dist/*.whl
 # TODO: export using poetry from docker container?
 
-
-# RUN python -m venv /app/venv
-# Install dependencies for ${DROP_DEMO_DIR}
 WORKDIR /app
-COPY ${DROP_DEMO_DIR}/pyproject.toml /app/
-COPY ${DROP_DEMO_DIR}/poetry.lock /app/
+COPY ${HERENOW_DEMO_DIR}/pyproject.toml /app/
+COPY ${HERENOW_DEMO_DIR}/poetry.lock /app/
 RUN touch README.md
-COPY ${DROP_DEMO_DIR}/src /app/src
+COPY ${HERENOW_DEMO_DIR}/src /app/src
+COPY drop.db /app/
 RUN poetry check
 RUN poetry build
 RUN pip install /app/dist/*.whl
 # TODO: export using poetry from docker container?
 
-EXPOSE 8000
+# just to test
+EXPOSE 8000 
 
 FROM base as final

@@ -23,11 +23,12 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_NO_CACHE_DIR=1 \
     POETRY_VERSION=1.5.1 
 
+RUN mkdir /app
+COPY drop.db /app/
 RUN pip install git+https://github.com/itissid/drop_webdemo.git@${DEPLOY_TAG}
 
 EXPOSE 8000
 WORKDIR /app
-COPY drop.db /app/drop.db
 
 ENTRYPOINT ["gunicorn", "herenow_demo.main:app"]
 CMD ["--bind", "0.0.0.0:8000", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker"]
