@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from collections import defaultdict
 from datetime import datetime
 from typing import Optional, Union
@@ -27,31 +28,60 @@ from drop_backend.utils.ors import (
     TransitDirectionError,
     TransitDirectionSummary,
 )
+from dotenv import load_dotenv
 from .utils.constants import boundary_geo_json
 
 # sys.path.append(
 #     "/Users/sid/workspace/drop/"
 # )  # I need to install drop and then run the webdemo as its own project to get rid of this hackery.
 
+load_dotenv()
+ALLOWED_ORIGINS = os.environ.get("ALLOWD_ORIGINS", "").strip().split(",")
+SQLLITE_PATH = os.environ.get("SQLITE_DB_PATH", "").strip()
+NOW_WINDOW_HOURS = int(
+    os.environ.get("NOW_WINDOW_HOURS", "1").strip()
+)  # Make this a const
+DEFAULT_START_TIME = os.environ.get("DEFAULT_START_TIME", "08:00").strip()
+RELOAD_WEBAPP = os.environ.get("RELOAD_WEBAPP", "False").lower() in ["true", "1"]
+SECRET_KEY = os.environ.get("SECRET_KEY")
+ORS_API_ENDPOINT = os.environ.get("ORS_API_ENDPOINT", "").strip()
+assert ALLOWED_ORIGINS and isinstance(
+    ALLOWED_ORIGINS, list
+), "Allowed origins not set or wrong"
+assert SQLLITE_PATH, "SQLLITE_PATH not set"
+assert SECRET_KEY, "SECRET_KEY not set"
+assert ORS_API_ENDPOINT, "ORS_API_ENDPOINT not set"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - [%(name)s:%(lineno)d] - %(message)s",
+    handlers=[logging.FileHandler("app.log"), logging.StreamHandler()],
+)
 logger = logging.getLogger(__name__)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        # TODO: Replace once committed.
-        "http://127.0.0.1:8000",
-        "http://localhost:8000",
-    ],  # Allows requests only from "https://example.com"
+        ALLOWED_ORIGINS,
+    ],
     allow_credentials=True,
     allow_methods=["GET"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
-app.add_middleware(SessionMiddleware, secret_key="my-secret-key")
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
+FILE_PATH = os.path.dirname(__file__)
+print(
+    " main module FILE_PATH: ", FILE_PATH, " all static will be found relative to this"
+)
+templates = Jinja2Templates(directory=os.path.join(FILE_PATH, "templates"))
 
-templates = Jinja2Templates(directory="src/herenow_demo/templates")
+# Needed for serving static files for the templates like CSS, JS
+app.mount(
+    "/static",
+    StaticFiles(directory=os.path.join(FILE_PATH, "static")),
+    name="static",
+)
 
-app.mount("/static", StaticFiles(directory="src/herenow_demo/static"), name="static")
-NOW_WINDOW_HOURS = 1  # Make this a const
 _engine: Engine
 
 
@@ -114,13 +144,14 @@ async def here(
         # Pass lat long, when to the backend method to get the data.
         filtered_events = geotag_moodtag_events_helper(
             _engine,
+            ors_api_endpoint=ORS_API_ENDPOINT,
             filename="hobokengirl_com_hoboken_jersey_city_events_september_1_2023_20230913_160012_a.txt_postprocessed",
             version="v1",
             where_lat=lat,
             where_lon=long,
             datetime_now=datetime_now,
             when=when,
-            now_window_hours=1,
+            now_window_hours=NOW_WINDOW_HOURS,
         )
         events_by_mood = defaultdict(list)
 
@@ -181,7 +212,7 @@ async def here(
                     tagged_event.event.event_json.get(  # type: ignore
                         "start_time", None
                     )
-                    or ["00:00"]
+                    or [DEFAULT_START_TIME]
                 )[0],
                 "addresses": list(i[-1] for i in tagged_event.directions),  # type: ignore
                 "closest_address": closest_address,
@@ -230,29 +261,51 @@ def _is_where_you_are_valid(lat: Optional[float], long: Optional[float]) -> bool
         return True
     return False
 
+
 # TODO: replace with a non hardcoded path.
-SQLLITE_PATH = "sqlite:////Users/sid/workspace/drop/drop.db"
+
+
 def init_db():
-    print("Initating DB")
-
-
-    global _engine
-    _engine = create_engine(
-        SQLLITE_PATH, connect_args={"check_same_thread": False}
-    )  # Create new DB
+    logger.info("Initating DB")
+    _engine = create_engine(SQLLITE_PATH, connect_args={"check_same_thread": False})
     bind_engine(_engine)
-    print("Initalized DB")
+    logger.info("Initalized DB")
+    return _engine
 
 
 def run():
-    # import uvicorn
+    # Is called when we run via an entry point when testig/debugging say (typically with an entry point within poetry:
+    # `poetry run herenow_demo`). There is a slight glitch here.
+    # When running with `poetry run` the uvicorn with the string argument
+    # it will trigger the DB initialization twice since uvicorn imports this module again using the string, which executes the else block below.
+    # This is not a problem per se right now, but it is a bit of a hack.
+    # Ideally just use gunicorn or uvicorn from the cli directly as shown below.
+    logger.warning("In run() context, ONLY USE FOR DEBUGGING NOT PROD")
+    import uvicorn
 
-    init_db()
+    # init_db()
     # NOTE that usually we can pass the app object directly to uvicorn.run
-    # but
     # TODO: remove reload in production.
-    # uvicorn.run("herenow_demo.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "herenow_demo.main:app", host="0.0.0.0", port=8000, reload=RELOAD_WEBAPP
+    )
 
 
 if __name__ == "__main__":
-    run()
+    # For direct execution as a script; typically in a virtual env like: `python -m herenow_demo.main`.
+    #
+    # DON'T use this in production!
+    logger.info("In context %s. ONLY USE FOR DEBUGGING NOT PROD", __name__)
+    _engine = init_db()
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=RELOAD_WEBAPP)
+
+else:
+    # From Command line directly or say via docker:
+    #  `uvicorn herenow_demo.main:app --host 0.0.0.0 --port 8000 --reload` # Though don't use --reload and don't use uvicorn with its --workers option since that is more limited in capabilities than using `gunicorn``.
+    # Recommended way(https://fastapi.tiangolo.com/deployment/server-workers/):
+    # gunicorn herenow_demo.main:app --bind 0.0.0.0:8000 --workers 1 --worker-class uvicorn.workers.UvicornWorker
+    #  `poetry run herenow_demo`(which indirectly runs: "herenow_demo.main:run" i.e. run())
+    logger.info("In context %s", __name__)
+    _engine = init_db()
