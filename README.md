@@ -9,20 +9,23 @@ I live in hoboken so this is only got content from there as a PoC.
 
 # What it looks like?
 
+> *Landing Page: Drop a pin within the area(no location permissions requested)*
 ![Entry Point](./docs/EntryPointSmall.jpg)
-> Landing Page: Drop a pin within the area(no location permissions requested)
 
+> *Next: The "Conscious Exploration" bits of the product:)*
 ![First Screen](./docs/FirstScreenSmall.jpg)
-> The "Conscious Exploration" screen. :)
 
+> *Also importantly: The use of modern AI: A pipeline to retrieve structured info from unstructured text and use RAG(embeddings and the like) to enrich and classify the  content... So it does not appear like a smorgasbord of information.*
 ![Second Screen](./docs/DetailsSmall.jpg)
-> The use of modern AI: A pipeline to retrieve structured info from 
-unstructured text and use RAG(embeddings and the like) to enrich and classify the  content... So it does not appear like a smorgasbord of information.
 
 The stack that uses AI and generates the DB(in Sqlite!) is [here](http://github.com/itissid/Drop-PoT)
 
+# What this repo contains?
+The front end which calls the backend([here](http://github.com/itissid/Drop-PoT) and all the opsy stuff to get it onto a cloud(Ongoing).
 
-# Stuff specific to building the demo(Docs are a WIP)
+
+# Stuff specific to building the demo(Opsy)
+Docs are a WIP so things may not work in the short term as expected
 ## Building and Distributing the Wheel.
 There were a lot of package install errors(Oh debian linux how precise you are) and wrangling with the initial pyproject.toml dependencies 
 that needed rust/c++ etc. Often there were errors and it took a fair bit of time building them from wheels/sdists, so I removed the deps that were not needed to build these packages, cutting down immensely on the size of the final installed binaries. This took a while...
@@ -86,12 +89,12 @@ gunicorn herenow_demo.main:app --bind 0.0.0.0:8000 --workers 1 \
 ```
 
 ## Check in the tags, preprep for docker build
-1. Now tag and push drop_backend.
-2. Change the pyproject.toml for herenow_demo to use the tag for dependency of drop_backend.
-3. Build and push herenow_demo to pypi.
-4. Make any changes to database. 
+1. Now use the tag from last step for both the projects.
+>  Change the pyproject.toml for herenow_demo to use the tag for dependency of drop_backend.
+3. Build and push both to pypi and git.
+4. Make any changes to database necessary. 
 
-## Docker 2(DockerfileDeploy): This will be the container that will host the app.
+## Docker 2(DockerfileDeploy): This will be the container that will host the app and the SQLite DB.
 0. Build the DockerfileDeploy.
 ```
 docker build \
@@ -108,7 +111,10 @@ docker build \
 docker run -p 8000:8000 -d herenow_demo_deploy
 ```
 2. Check on the browser one last time!
-3. Now that both the deps are 
+3. Now that both the deps are in the container, push to registry.
+
+## Next(Deploy docker to cloud)
+TODO
 
 # Notes
 While building the above i realized that I am actually doing a mini release strategy. Something that github or gitlab can probably help me
