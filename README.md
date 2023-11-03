@@ -1,11 +1,10 @@
 # What is this?
-The project marries Consious Exploration(my idea of Productization of "being here in the moment" and Travel) and the "*new*" AI for infra. 
+The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel) and the "*new*" AI for infra. Its a seed for an idea on how to explore our neighborhoods all the while being Aware and being Here. Here can be at home or anywhere
+in your city.
 
-Being *here* in the moment(meditation and awareness are very close to my heart) from a travel (I love the idea of weekend travel in big cities like say NYC)  PoV means you 
-can make a choice to exactly where you are(home) or explore the city 
-based on your preferences. 
+Awareness and being conscious of this moment are two ideas are very close to my heart(Meditation is a key component of it). I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring big places like NYC.
 
-I live in hoboken so this is only got content from there as a PoC.
+I live in Hoboken, NJ so this is only content from there and intended to present a PoC.
 
 # What it looks like?
 
