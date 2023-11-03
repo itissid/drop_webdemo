@@ -1,4 +1,4 @@
-FROM python:3.10-slim as base
+FROM python:3.10-slim as backend-builder
 ARG DROP_BACKEND_DIR
 ARG HERENOW_DEMO_DIR
 
@@ -29,21 +29,26 @@ RUN touch README.md
 COPY ${DROP_BACKEND_DIR}/src /backend/src
 RUN poetry check
 RUN poetry build
-RUN pip install /backend/dist/*.whl
+RUN bash -c "ls -lart /backend/dist || true"
+# RUN pip install /backend/dist/*.whl
 # TODO: export using poetry from docker container?
+# Second stage: build the app based on the backend
 
+FROM backend-builder as app-builder
 WORKDIR /app
 COPY ${HERENOW_DEMO_DIR}/pyproject.toml /app/
 COPY ${HERENOW_DEMO_DIR}/poetry.lock /app/
-RUN touch README.md
 COPY ${HERENOW_DEMO_DIR}/src /app/src
+
+RUN chmod +x /app/src/${HERENOW_DEMO_DIR}/configure_demo.py
+RUN python /app/src/${HERENOW_DEMO_DIR}/configure_demo.py --backend-dist-dir /backend/dist --app-dir /app
+
+RUN touch README.md
 COPY drop.db /app/
 RUN poetry check
 RUN poetry build
-RUN pip install /app/dist/*.whl
+RUN pip install /app/dist/herenow_demo-*.whl
 # TODO: export using poetry from docker container?
 
 # just to test
 EXPOSE 8000 
-
-FROM base as final

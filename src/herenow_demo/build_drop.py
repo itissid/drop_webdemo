@@ -5,6 +5,8 @@ import os
 import shutil
 import fnmatch
 import subprocess
+import tomlkit
+import semver
 
 # Initialize argument parser
 parser = ArgumentParser(
@@ -44,8 +46,27 @@ parser.add_argument(
     type=str,
     help="Tagged version of herenow_demo to clone if source is github.",
 )
-
+parser.add_argument(
+    "--update-backend-version",
+    action="store_true",
+    help="Update the patch version of the backend project to an alpha version before the build.",
+    default=True,
+)
+parser.add_argument(
+    "--bump-version",
+    choices=["major", "minor", "patch"],
+    default="patch",
+    help="Part of the version to bump (major, minor, patch).",
+)
 print("Argument parser setup done.")
+
+
+def run_poetry_commands(project_dir):
+    # Run poetry check to validate the pyproject.toml file
+    subprocess.run(["poetry", "check"], cwd=project_dir, check=True)
+
+    # Run poetry update to update the dependencies and lock file
+    subprocess.run(["poetry", "update"], cwd=project_dir, check=True)
 
 
 def clone_or_copy_project_with_ignore(
@@ -65,11 +86,13 @@ def clone_or_copy_project_with_ignore(
             "*.tmp",
             "*.sql",
             "*.db",
-            ".vscode",
+            "*.ini" ".vscode",
             "*.code-workspace",
             "pyvenv.cfg",
             ".python-version",
             "**/.DS_Store",
+            "dist",
+            "tests/",
         ]
 
         return [
@@ -115,6 +138,56 @@ def update_pyproject_toml(demo_project_dir):
         config_parser.write(f)
 
 
+def update_app_dependency(app_project_dir, backend_version):
+    app_toml_file = os.path.join(app_project_dir, "pyproject.toml")
+
+    # Construct the expected wheel filename
+    backend_wheel_filename = f"drop_backend-{backend_version}-py3-none-any.whl"
+    backend_wheel_path = f"/backend/dist/{backend_wheel_filename}"
+
+    with open(app_toml_file, 'r', encoding='utf-8') as f:
+        data = tomlkit.parse(f.read())
+
+    # Update the dependency to point to the wheel file within the Docker container
+    data['tool']['poetry']['dependencies']['drop-backend'] = {
+        "file": backend_wheel_path
+    }
+
+    # Write the updated data back to pyproject.toml
+    with open(app_toml_file, 'w', encoding='utf-8') as f:
+        f.write(tomlkit.dumps(data))
+
+
+def update_backend_version(backend_project_dir, version_part):
+    toml_file = os.path.join(backend_project_dir, "pyproject.toml")
+
+    with open(toml_file, "r", encoding="utf-8") as f:
+        data = tomlkit.parse(f.read())
+
+    # Get the current version
+    version = data["tool"]["poetry"]["version"]
+
+    # Bump the version
+    if version_part == "major":
+        new_version = semver.bump_major(version)
+    elif version_part == "minor":
+        new_version = semver.bump_minor(version)
+    else:  # patch is the default
+        new_version = semver.bump_patch(version)
+
+    # Append the "-alpha" suffix
+    new_version += "-alpha"
+
+    # Update the version in the pyproject.toml data
+    data["tool"]["poetry"]["version"] = new_version
+
+    # Write the updated data back to pyproject.toml
+    with open(toml_file, "w", encoding="utf-8") as f:
+        f.write(tomlkit.dumps(data))
+
+    return new_version
+
+
 def main():
     args = parser.parse_args()
 
@@ -141,6 +214,8 @@ def main():
         clone_or_copy_project_with_ignore(
             args.pot_source, local_dropbackend_dir, args.pot_dir, args.pot_tag, temp_dir
         )
+    else:
+        raise ValueError("No backend source provided")
 
     # Clone or copy herenow_demo project
     local_drop_demo_dir = "herenow_demo"
@@ -152,12 +227,30 @@ def main():
             args.demo_tag,
             temp_dir,
         )
+    else:
+        raise ValueError("No demo source provided")
+
+    backend_temp_dir = os.path.join(temp_dir, local_dropbackend_dir)
+    run_poetry_commands(backend_temp_dir)
+
+    if args.update_backend_version:
+        backend_version = update_backend_version(
+            backend_temp_dir, args.bump_version
+        )
+        backend_wheel_filename = f"drop_backend-{backend_version}-py3-none-any.whl"  # Construct the expected wheel filename
+        backend_wheel_path = os.path.join(
+            temp_dir, local_dropbackend_dir, "dist", backend_wheel_filename
+        )
+        update_app_dependency(
+            os.path.join(temp_dir, local_drop_demo_dir), backend_wheel_path
+        )
 
     # Update pyproject.toml in herenow_demo project
 
     # update_pyproject_toml(os.path.join(temp_dir, local_drop_demo_dir))
 
     # Execute Docker build command
+    print("DONT forget to copy the database and the run the follwing")
     print(
         "To build docker image: fire the command",
         " ".join(
@@ -172,7 +265,7 @@ def main():
                 f"DROP_DEMO_DIR={local_drop_demo_dir}",
                 "-f",
                 "Dockerfile",
-                "/tmp/subdir",
+                temp_dir,
             ]
         ),
     )

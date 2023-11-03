@@ -175,23 +175,24 @@ files = [
 
 [[package]]
 name = "anyio"
-version = "3.6.2"
+version = "3.7.1"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
 optional = false
-python-versions = ">=3.6.2"
+python-versions = ">=3.7"
 files = [
-    {file = "anyio-3.6.2-py3-none-any.whl", hash = "sha256:fbbe32bd270d2a2ef3ed1c5d45041250284e31fc0a4df4a5a6071842051a51e3"},
-    {file = "anyio-3.6.2.tar.gz", hash = "sha256:25ea0d673ae30af41a0c442f81cf3b38c7e79fdc7b60335a4c14e05eb0947421"},
+    {file = "anyio-3.7.1-py3-none-any.whl", hash = "sha256:91dee416e570e92c64041bd18b900d1d6fa78dff7048769ce5ac5ddad004fbb5"},
+    {file = "anyio-3.7.1.tar.gz", hash = "sha256:44a3c9aba0f5defa43261a8b3efb97891f2bd7d804e0e1f56419befa1adfc780"},
 ]
 
 [package.dependencies]
+exceptiongroup = {version = "*", markers = "python_version < \"3.11\""}
 idna = ">=2.8"
 sniffio = ">=1.1"
 
 [package.extras]
-doc = ["packaging", "sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme"]
-test = ["contextlib2", "coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "mock (>=4)", "pytest (>=7.0)", "pytest-mock (>=3.6.1)", "trustme", "uvloop (<0.15)", "uvloop (>=0.15)"]
-trio = ["trio (>=0.16,<0.22)"]
+doc = ["Sphinx", "packaging", "sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme (>=1.2.2)", "sphinxcontrib-jquery"]
+test = ["anyio[trio]", "coverage[toml] (>=4.5)", "hypothesis (>=4.0)", "mock (>=4)", "psutil (>=5.9)", "pytest (>=7.0)", "pytest-mock (>=3.6.1)", "trustme", "uvloop (>=0.17)"]
+trio = ["trio (<0.22)"]
 
 [[package]]
 name = "appnope"
@@ -902,21 +903,22 @@ files = [
 
 [[package]]
 name = "drop-backend"
-version = "0.1.0"
+version = "0.1.1"
 description = "Command line tools for building drop"
 optional = false
-python-versions = "^3.10"
-files = []
-develop = false
+python-versions = ">=3.10,<4.0"
+files = [
+    {file = "drop_backend-0.1.1-py3-none-any.whl", hash = "sha256:b2258cf42a75c9536c455b084dc00586a30935288aa2febd77c777e5d325eed2"},
+    {file = "drop_backend-0.1.1.tar.gz", hash = "sha256:7c9dd38abc6bce7e67a2808e306d379aaed55037f7e1ae7fdaad2da99177fc38"},
+]
 
 [package.dependencies]
 aiofiles = "23.1.0"
 aiohttp = "3.8.4"
 aiosignal = "1.3.1"
-alembic = "^1.11.3"
-annotated-types = "^0.6.0"
+alembic = ">=1.11.3,<2.0.0"
+annotated-types = ">=0.6.0,<0.7.0"
 antlr4-python3-runtime = "4.9.3"
-anyio = "3.6.2"
 appnope = "0.1.3"
 argon2-cffi = "21.3.0"
 argon2-cffi-bindings = "21.2.0"
@@ -948,7 +950,7 @@ dataclasses-json = "0.5.9"
 debugpy = "1.6.7"
 decorator = "5.1.1"
 defusedxml = "0.7.1"
-deptry = "^0.12.0"
+deptry = ">=0.12.0,<0.13.0"
 distlib = "0.3.6"
 einops = "0.6.1"
 exceptiongroup = "1.1.1"
@@ -964,8 +966,6 @@ gitdb = "4.0.10"
 h11 = "0.14.0"
 h2 = "4.1.0"
 hpack = "4.0.0"
-httpcore = "0.17.3"
-httpx = "0.24.1"
 hupper = "1.12"
 hypercorn = "0.14.3"
 hyperframe = "6.0.1"
@@ -995,7 +995,7 @@ mistune = "2.0.5"
 mpmath = "1.3.0"
 multidict = "6.0.4"
 murmurhash = "1.0.9"
-mypy = "^1.6.1"
+mypy = ">=1.6.1,<2.0.0"
 mypy-extensions = "1.0.0"
 nest-asyncio = "1.5.6"
 networkx = "3.1"
@@ -1021,15 +1021,15 @@ psutil = "5.9.5"
 ptyprocess = "0.7.0"
 pure-eval = "0.2.2"
 pycparser = "2.21"
-pydantic = {version = "^2.3.0", extras = ["mypy"]}
-pygeoif = "^1.1.1"
+pydantic = {version = ">=2.3.0,<3.0.0", extras = ["mypy"]}
+pygeoif = ">=1.1.1,<2.0.0"
 pygments = "2.15.1"
 pympler = "1.0.1"
 pyparsing = "3.0.9"
 pyrsistent = "0.19.3"
 pytest = "7.4.0"
 python-dateutil = "2.8.2"
-python-dotenv = "^1.0.0"
+python-dotenv = ">=1.0.0,<2.0.0"
 python-json-logger = "2.0.7"
 python-magic = "0.4.27"
 python-multipart = "0.0.6"
@@ -1064,14 +1064,14 @@ tabulate = "0.9.0"
 tenacity = "8.2.2"
 terminado = "0.17.1"
 text-unidecode = "1.3"
-time-uuid = "^0.2.0"
+time-uuid = ">=0.2.0,<0.3.0"
 tinycss2 = "1.2.1"
 toml = "0.10.2"
 tomli = "2.0.1"
 tornado = "6.3.2"
 tqdm = "4.65.0"
 traitlets = "5.9.0"
-typer = "^0.9.0"
+typer = ">=0.9.0,<0.10.0"
 types-requests = "2.31.0.1"
 types-urllib3 = "1.26.25.13"
 typing-extensions = "4.6.3"
@@ -1093,13 +1093,7 @@ zipp = "3.15.0"
 
 [package.extras]
 debugging-analysis = ["icontract (>=2.6.2,<3.0.0)", "ipdb (>=0.13,<0.14)", "ipykernel (==6.23.1)", "ipython-genutils (==0.2.0)", "ipywidgets (==8.0.6)"]
-tools = ["interline-planetutils @ git+https://github.com/interline-io/planetutils.git", "pylance (==0.5.4)", "pylint (>=2.17.5,<3.0.0)"]
-
-[package.source]
-type = "git"
-url = "https://github.com/itissid/Drop-PoT.git"
-reference = "v1.0.4"
-resolved_reference = "c982edda666fbf047db193f2b24a77dd6b2fa7a5"
+tools = ["pylance (==0.5.4)", "pylint (>=2.17.5,<3.0.0)"]
 
 [[package]]
 name = "einops"
@@ -1142,16 +1136,17 @@ tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
 name = "fastapi"
-version = "0.103.0"
+version = "0.103.2"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "fastapi-0.103.0-py3-none-any.whl", hash = "sha256:61ab72c6c281205dd0cbaccf503e829a37e0be108d965ac223779a8479243665"},
-    {file = "fastapi-0.103.0.tar.gz", hash = "sha256:4166732f5ddf61c33e9fa4664f73780872511e0598d4d5434b1816dc1e6d9421"},
+    {file = "fastapi-0.103.2-py3-none-any.whl", hash = "sha256:3270de872f0fe9ec809d4bd3d4d890c6d5cc7b9611d721d6438f9dacc8c4ef2e"},
+    {file = "fastapi-0.103.2.tar.gz", hash = "sha256:75a11f6bfb8fc4d2bec0bd710c2d5f2829659c0e8c0afd5560fdda6ce25ec653"},
 ]
 
 [package.dependencies]
+anyio = ">=3.7.1,<4.0.0"
 pydantic = ">=1.7.4,<1.8 || >1.8,<1.8.1 || >1.8.1,<2.0.0 || >2.0.0,<2.0.1 || >2.0.1,<2.1.0 || >2.1.0,<3.0.0"
 starlette = ">=0.27.0,<0.28.0"
 typing-extensions = ">=4.5.0"
@@ -1496,50 +1491,6 @@ files = [
     {file = "hpack-4.0.0-py3-none-any.whl", hash = "sha256:84a076fad3dc9a9f8063ccb8041ef100867b1878b25ef0ee63847a5d53818a6c"},
     {file = "hpack-4.0.0.tar.gz", hash = "sha256:fc41de0c63e687ebffde81187a948221294896f6bdc0ae2312708df339430095"},
 ]
-
-[[package]]
-name = "httpcore"
-version = "0.17.3"
-description = "A minimal low-level HTTP client."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "httpcore-0.17.3-py3-none-any.whl", hash = "sha256:c2789b767ddddfa2a5782e3199b2b7f6894540b17b16ec26b2c4d8e103510b87"},
-    {file = "httpcore-0.17.3.tar.gz", hash = "sha256:a6f30213335e34c1ade7be6ec7c47f19f50c56db36abef1a9dfa3815b1cb3888"},
-]
-
-[package.dependencies]
-anyio = ">=3.0,<5.0"
-certifi = "*"
-h11 = ">=0.13,<0.15"
-sniffio = "==1.*"
-
-[package.extras]
-http2 = ["h2 (>=3,<5)"]
-socks = ["socksio (==1.*)"]
-
-[[package]]
-name = "httpx"
-version = "0.24.1"
-description = "The next generation HTTP client."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "httpx-0.24.1-py3-none-any.whl", hash = "sha256:06781eb9ac53cde990577af654bd990a4949de37a28bdb4a230d434f3a30b9bd"},
-    {file = "httpx-0.24.1.tar.gz", hash = "sha256:5853a43053df830c20f8110c5e69fe44d035d850b2dfe795e196f00fdb774bdd"},
-]
-
-[package.dependencies]
-certifi = "*"
-httpcore = ">=0.15.0,<0.18.0"
-idna = "*"
-sniffio = "*"
-
-[package.extras]
-brotli = ["brotli", "brotlicffi"]
-cli = ["click (==8.*)", "pygments (==2.*)", "rich (>=10,<14)"]
-http2 = ["h2 (>=3,<5)"]
-socks = ["socksio (==1.*)"]
 
 [[package]]
 name = "hupper"
@@ -3365,6 +3316,17 @@ pygments = ">=2.13.0,<3.0.0"
 jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
+name = "semver"
+version = "3.0.2"
+description = "Python helper for Semantic Versioning (https://semver.org)"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "semver-3.0.2-py3-none-any.whl", hash = "sha256:b1ea4686fe70b981f85359eda33199d60c53964284e0cfb4977d243e37cf4bf4"},
+    {file = "semver-3.0.2.tar.gz", hash = "sha256:6253adb39c70f6e51afed2fa7152bcd414c411286088fb4b9effb133885ab4cc"},
+]
+
+[[package]]
 name = "send2trash"
 version = "1.8.2"
 description = "Send file to trash natively under Mac OS X, Windows and Linux"
@@ -3899,6 +3861,17 @@ files = [
 ]
 
 [[package]]
+name = "tomlkit"
+version = "0.12.2"
+description = "Style preserving TOML library"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tomlkit-0.12.2-py3-none-any.whl", hash = "sha256:eeea7ac7563faeab0a1ed8fe12c2e5a51c61f933f2502f7e9db0241a65163ad0"},
+    {file = "tomlkit-0.12.2.tar.gz", hash = "sha256:df32fab589a81f0d7dc525a4267b6d7a64ee99619cbd1eeb0fae32c1dd426977"},
+]
+
+[[package]]
 name = "tornado"
 version = "6.3.2"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
@@ -4326,4 +4299,4 @@ quality = ["mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8b0495368192370087c4bf33b5dc71e499a26ec6240da083a8bb3a6fdaac8178"
+content-hash = "d3330dc078f62295566137d0a3e9840d7305203659a9cd853dadf61641563284"

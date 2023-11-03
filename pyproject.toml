@@ -16,9 +16,11 @@ shapely = "^2.0.2"
 gunicorn = "^21.2.0"
 uvicorn = "^0.23.2"
 itsdangerous = "^2.1.2"
-mypy = {version = "^1.6.1", optional = true}
+mypy = { version = "^1.6.1", optional = true }
 python-dotenv = "^1.0.0"
-drop_backend = { git = "https://github.com/itissid/Drop-PoT.git", tag = "v1.0.4" }
+drop-backend = "^0.1.0"
+tomlkit = "^0.12.2"
+semver = "^3.0.2"
 
 
 [tool.poetry.extras]
