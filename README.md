@@ -1,7 +1,7 @@
 # What is this?
 The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel) and the "*new*" AI for infra. Its a seed for an idea on how to explore our neighborhoods and being Here in the moment. "Here" can be at home or really anywhere you are in your city, because no matter how you got there its where you are now.
 
-Awareness and being conscious of this moment are two ideas close to my heart(Meditation is key to getting there.). I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring big places like NYC.
+Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small.
 
 I live in Hoboken, NJ so this is only content from there and intended to present a PoC.
 
