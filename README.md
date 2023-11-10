@@ -1,28 +1,30 @@
 # What is this [demo](http://drophere.me)?
-The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel) and shows off the "*new*" AI for extracting structure from unstructured text to power website. 
+The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel).
 
-The REST route names are designed with a conscious disposition of [Being Here Now](https://en.wikipedia.org/wiki/Be_Here_Now_(book)). 
+The REST routes encapsulate a conscious disposition of Time and Space I wanted to capture:
 
 > Here == Location and Now == Time
 
 - You always start with the *where*:
 [/presence/where](http://drophere.me/presence/where)
 
-- Once you planted a pin(here) its where you are; and you are dropped into the *now*, the REST route becomes:
+- Once you planted a pin(*Here*) its where you are; and you are dropped into the *Now*, the REST route becomes:
 [/presence/here/?when=now](http://drophere.me/presence/here/?when=now)
-Events here display whats happening now(< 1 hour or ongoing) around you.
+The UI has catagorized events and whats happening now(typically < 1 hour or ongoing) around you.
 
-- But you can press the button at the bottom imagine about the **later**(It takes you away from the now: 
+- But you can press the button at the bottom imagine about the later too (It takes you away from the now, we are humans after all :) ): 
 [/presence/here/?when=later](http://drophere.me/presence/here/?when=later)
-Events here display whats happening later(typicall > 1hour).
-
+Things displayer here are whats happening later(typically > 1hour).
 
 Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small.
 
 I live in Hoboken, NJ so this is only content from there and intended to present a PoC.
 
 # Tech stack
-This repo is just the front end(FastAPI, Jinja, Bootstap CSS, Swiper.js). The API and Data pipes that uses AI(OpenAI, Pydantic, OpenRouteService) and generates the data indexed into a DB(in Sqlite!) is [here](http://github.com/itissid/Drop-PoT.git)
+- This repo is just the front end(FastAPI, Jinja, Bootstap CSS, Swiper.js).
+- It shows off the "*new*" AI for extracting structure from unstructured text to power website using basic RAG and Single Shot Retrieval. 
+- The API and Data pipes that uses Smarts(OpenAI, Pydantic, OpenRouteService) and generates the data indexed into a DB(in Sqlite!).
+The last two bits live in another repo [here](http://github.com/itissid/Drop-PoT.git)
 
 # What it looks like?
 (I am about to deploy the docker to the cloud, but here are some screenshots from the local docker container to explain the idea)
