@@ -25,16 +25,15 @@ If you just want Zen with immersive sound and visuals, toggle the screen with th
 
 ---- 
 ## How is this about travelling?
-- I consider myself a weekend traveller most of times and the Site has exactly that content. I go to explore the city and people around me. This is a tool for a usecase of 1(at the moment).
+I consider myself a weekend traveller most of times and the Site has exactly that content. I go to explore the city and people around me on those days. This is a tool for a usecase of 1(at the moment). I hope it can grow.
 
-Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small.
-
-I live in Hoboken, NJ so this is only content from there and intended to present a PoC.
+# Who am I?
+Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small. I live in Hoboken, NJ so the demo is only content from there.
 
 # Tech stack
 - This repo is just the front end(FastAPI, Jinja, Bootstap CSS, Swiper.js).
 - It shows off the "*new*" AI for extracting structure from unstructured text to power website using basic RAG and Single Shot Retrieval. 
-- The API and Data pipes that uses Smarts(OpenAI, Pydantic, OpenRouteService) and generates the data indexed into a DB(in Sqlite!).
+- The API and Data pipes that uses Smarts(OpenAI), OpenRouteService, FastAPI all in Python; It scrapes, augments and indexes the data into a DB (in Sqlite!).
 The last two bits live in another repo [here](http://github.com/itissid/Drop-PoT.git)
 
 # What it looks like?
