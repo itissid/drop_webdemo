@@ -8,15 +8,15 @@ The REST routes encapsulate a conscious disposition of Time and Space I wanted t
 - You always start with the *where*:
 [/presence/where](http://drophere.me/presence/where)
 
-- Once you planted a pin(*Here*) its where you are; and you are dropped into the *Now*, the REST route becomes:
-[/presence/here/?when=now](http://drophere.me/presence/here/?when=now)
-The UI has catagorized events and whats happening now(typically < 1 hour or ongoing) around you.
+- With a pin planted, *Here* is where you are; you are dropped into the *Now*, the route becomes:
+[/presence/here/?when=now](http://drophere.me/presence/here/?when=now).
+The UI has catagorized events happening *Now*(technically in < 1 hour or ongoing) around you.
 
-- But you can press the button at the bottom imagine about the later too (It takes you away from the now, we are humans after all :) ): 
+- But press the button at the bottom of the UI and explore the **later** too (we are explorers too after all :) ): 
 [/presence/here/?when=later](http://drophere.me/presence/here/?when=later)
-Things displayer here are whats happening later(typically > 1hour).
+Things displayer here are whats happening *later* (technically > 1 hour from now).
 
-- If you just want to meditate with a quiet sound you can toggle the screen with the button on the top left.
+- If you just want Zen with immersive sound and visuals, you can toggle the screen with the button on the top left.
 
 How is this about travelling?
 - I consider myself a weekend traveller most of times and the Site has exactly that content. I go to explore the city and people around me. This is a tool for a usecase of 1(at the moment).
