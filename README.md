@@ -19,7 +19,7 @@ Things displayer here are whats happening later(typically > 1hour).
 - If you just want to meditate with a quiet sound you can toggle the screen with the button on the top left.
 
 How is this about travelling?
-- I consider myself a weekend traveller most of times. I go to explore the city and people around me.
+- I consider myself a weekend traveller most of times and the Site has exactly that content. I go to explore the city and people around me. This is a tool for a usecase of 1(at the moment).
 
 Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small.
 
