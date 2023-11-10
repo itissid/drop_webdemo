@@ -16,6 +16,11 @@ The UI has catagorized events and whats happening now(typically < 1 hour or ongo
 [/presence/here/?when=later](http://drophere.me/presence/here/?when=later)
 Things displayer here are whats happening later(typically > 1hour).
 
+- If you just want to meditate with a quiet sound you can toggle the screen with the button on the top left.
+
+How is this about travelling?
+- I consider myself a weekend traveller most of times. I go to explore the city and people around me.
+
 Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small.
 
 I live in Hoboken, NJ so this is only content from there and intended to present a PoC.
