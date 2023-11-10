@@ -1,7 +1,7 @@
 # What is this [demo](http://drophere.me)?
-The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel).
+The demo is a PoC on Consious Urban Exploration, it is also kind of a productization of being Here In The Moment and Travel. I used AI, OpenRouteServicem FastAPI and K8s for building it.
 
-The REST routes encapsulate a conscious disposition of Time and Space I wanted to capture: Here and Now(or Later).
+The REST routes of the website encapsulate a conscious disposition of Time and Space I wanted to capture: Here and Now(or Later).
 
 ## Here == Location and Now/Later == Time
 #### You always start with the *Where*:
