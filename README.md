@@ -1,5 +1,21 @@
-# What is this?
-The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel) and the "*new*" AI for infra. Its a seed for an idea on how to explore our neighborhoods and being Here in the moment. "Here" can be at home or really anywhere you are in your city, because no matter how you got there its where you are now.
+# What is this [demo](http://drophere.me)?
+The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel) and shows off the "*new*" AI for extracting structure from unstructured text to power website. 
+
+The REST route names are designed with a conscious disposition of [Being Here Now](https://en.wikipedia.org/wiki/Be_Here_Now_(book)). 
+
+> Here == Location and Now == Time
+
+- You always start with the *where*:
+[/presence/where](http://drophere.me/presence/where)
+
+- Once you planted a pin(here) its where you are; and you are dropped into the *now*, the REST route becomes:
+[/presence/here/?when=now](http://drophere.me/presence/here/?when=now)
+Events here display whats happening now(< 1 hour or ongoing) around you.
+
+- But you can press the button at the bottom imagine about the **later**(It takes you away from the now: 
+[/presence/here/?when=later](http://drophere.me/presence/here/?when=later)
+Events here display whats happening later(typicall > 1hour).
+
 
 Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small.
 
