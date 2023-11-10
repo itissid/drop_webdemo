@@ -1,24 +1,30 @@
 # What is this [demo](http://drophere.me)?
 The project marries Consious Urban Exploration(it is also kind of a productization of being "Here In The Moment" and Travel).
 
-The REST routes encapsulate a conscious disposition of Time and Space I wanted to capture:
+The REST routes encapsulate a conscious disposition of Time and Space I wanted to capture: Here and Now(or Later).
 
-> Here == Location and Now == Time
-
-- You always start with the *where*:
+## Here == Location and Now/Later == Time
+#### You always start with the *Where*:
 [/presence/where](http://drophere.me/presence/where)
+Plant a pin *Here* :)
 
-- With a pin planted, *Here* is where you are; you are dropped into the *Now*, the route becomes:
-[/presence/here/?when=now](http://drophere.me/presence/here/?when=now).
+### A Pin is planted *Here* and thus its where you are.
+
+You are now dropped into the *Now* screen, the route is: [/presence/here/?when=now](http://drophere.me/presence/here/?when=now&lat=40.74816730666263&long=-74.04544830322267).
+
 The UI has catagorized events happening *Now*(technically in < 1 hour or ongoing) around you.
 
-- But press the button at the bottom of the UI and explore the **later** too (we are explorers too after all :) ): 
-[/presence/here/?when=later](http://drophere.me/presence/here/?when=later)
-Things displayer here are whats happening *later* (technically > 1 hour from now).
+### But we are also explorers, A Button press takes you to the *Later*: 
+[/presence/here/?when=later](http://drophere.me/presence/here/?when=later&lat=40.74816730666263&long=-74.04544830322267)
 
-- If you just want Zen with immersive sound and visuals, you can toggle the screen with the button on the top left.
+*Later* UI has events technically happening > 1 hour from now or not on going.
 
-How is this about travelling?
+### Not do anything, just relax?
+
+If you just want Zen with immersive sound and visuals, toggle the screen with the button on the top left.
+
+---- 
+## How is this about travelling?
 - I consider myself a weekend traveller most of times and the Site has exactly that content. I go to explore the city and people around me. This is a tool for a usecase of 1(at the moment).
 
 Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small.
