@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "herenow_demo"
-version = "0.1.0"
+version = "1.0.0-alpha"
 description = "Demo of Approximate Retrieval capability of LLMs appplied to build a product for Mindful Exploration of Urban Events."
 authors = ["Sid <itissid@gmail.com>"]
 license = "CC BY NC"
@@ -16,11 +16,14 @@ shapely = "^2.0.2"
 gunicorn = "^21.2.0"
 uvicorn = "^0.23.2"
 itsdangerous = "^2.1.2"
-mypy = { version = "^1.6.1", optional = true }
+mypy = { extras = ["dmypy"], version = "^1.7.0" }
 python-dotenv = "^1.0.0"
-drop-backend = "^0.1.0"
+drop-backend = "1.1.1"
+# Local testing
+# drop-backend = { path = "../drop" }
 tomlkit = "^0.12.2"
 semver = "^3.0.2"
+pytz = "2023.3"
 
 
 [tool.poetry.extras]

@@ -1,9 +1,10 @@
 import json
 import logging
 import os
+import pytz
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional, Union, Dict, List
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,7 +30,15 @@ from drop_backend.utils.ors import (
 )
 from dotenv import load_dotenv
 from .utils.constants import boundary_geo_json
+from drop_backend.utils.datetime_utils import (
+    assert_datetime_format,
+    datetime_string_processor,
+)
 
+# TODO:
+## Use env vars to set the FILE_VERSION constrains
+## Use them for floating time and date
+## stick them in the env file and fire up the app locally in uvicorn/docker
 load_dotenv()
 ALLOWED_ORIGINS = os.environ.get("ALLOWD_ORIGINS", "").strip().split(",")
 SQLLITE_DB_PATH = os.environ.get("SQLITE_DB_PATH", "").strip()
@@ -37,9 +46,38 @@ NOW_WINDOW_HOURS = int(
     os.environ.get("NOW_WINDOW_HOURS", "1").strip()
 )  # Make this a const
 DEFAULT_START_TIME = os.environ.get("DEFAULT_START_TIME", "08:00").strip()
+_FIX_NOW_DATETIME = os.environ.get("FIX_NOW_DATETIME", "").strip()
+FIX_NOW_DATETIME = None
+if _FIX_NOW_DATETIME:
+    if assert_datetime_format(_FIX_NOW_DATETIME, "%Y-%m-%d %H:%M"):
+        FIX_NOW_DATETIME = datetime.strptime(_FIX_NOW_DATETIME, "%Y-%m-%d %H:%M")
+    elif assert_datetime_format(_FIX_NOW_DATETIME, "%Y-%m-%d"):
+        FIX_NOW_DATETIME = datetime.strptime(_FIX_NOW_DATETIME, "%Y-%m-%d")
+    else:
+        raise ValueError(
+            "FIX_NOW_DATETIME must be in the format %Y-%m-%d with an optional %H:%M"
+        )
+
 RELOAD_WEBAPP = os.environ.get("RELOAD_WEBAPP", "False").lower() in ["true", "1"]
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ORS_API_ENDPOINT = os.environ.get("ORS_API_ENDPOINT", "").strip()
+# in the format "file1:[version1,version2],file2:[version2]"
+_FILE_VERSION_CONSTRAINTS_STR = os.environ.get("FILE_VERSION_CONSTRAINTS", "").strip()
+FILE_VERSION_CONSTRAINTS_DICT: Dict[str, List[str]] = {}
+if _FILE_VERSION_CONSTRAINTS_STR:
+    FILE_VERSION_CONSTRAINTS_DICT: Dict[str, List[str]] = json.loads(  # type: ignore
+        _FILE_VERSION_CONSTRAINTS_STR
+    )
+    assert FILE_VERSION_CONSTRAINTS_DICT and len(FILE_VERSION_CONSTRAINTS_DICT) > 0
+    assert isinstance(FILE_VERSION_CONSTRAINTS_DICT, dict) and all(
+        isinstance(vs, list) and len(vs) > 0
+        for vs in FILE_VERSION_CONSTRAINTS_DICT.values()
+    ), "FILE_VERSION_CONSTRAINTS must be a non empty json string with a dict of lists"
+else:
+    raise ValueError(
+        "FILE_VERSION_CONSTRAINTS not set. Must be set to a non empty json string"
+    )
+
 assert ALLOWED_ORIGINS and isinstance(
     ALLOWED_ORIGINS, list
 ), "Allowed origins not set or wrong"
@@ -135,13 +173,23 @@ async def here(
         assert lat and long
         print("You are here.")
         # now lets get all the events that are going to happen close to now
-        datetime_now = datetime.strptime("2023-09-01 10:00", "%Y-%m-%d %H:%M")
+        if not FIX_NOW_DATETIME:
+            eastern = pytz.timezone("US/Eastern")
+            datetime_now = datetime.strptime(
+                datetime.now(eastern).strftime("%Y-%m-%d %H:%M"), ("%Y-%m-%d %H:%M")
+            )
+        else:
+            datetime_now = FIX_NOW_DATETIME
+        # For testing
+        # datetime_now = datetime.strptime("2023-09-01 10:00", "%Y-%m-%d %H:%M")
         # Pass lat long, when to the backend method to get the data.
         filtered_events = geotag_moodtag_events_helper(
             _engine,
             ORS_API_ENDPOINT,
-            filename="hobokengirl_com_hoboken_jersey_city_events_september_1_2023_20230913_160012_a.txt_postprocessed",
-            version="v1",
+            FILE_VERSION_CONSTRAINTS_DICT,
+            # For testing
+            # filename="hobokengirl_com_hoboken_jersey_city_events_september_1_2023_20230913_160012_a.txt_postprocessed",
+            # version="v1",
             where_lat=lat,
             where_lon=long,
             datetime_now=datetime_now,
