@@ -1,5 +1,5 @@
 # For deploying  fully built docker to a container.
-FROM python:3.10-slim as base
+FROM --platform=linux/amd64 python:3.10-slim as base
 
 ARG SQLITE_DB_PATH
 ARG RELOAD_WEBAPP
@@ -7,15 +7,17 @@ ARG SECRET_KEY
 ARG ORS_API_ENDPOINT
 ARG ALLOWED_ORIGINS
 ARG DEPLOY_TAG
+ARG FILE_VERSION_CONSTRAINTS
 
 ENV SQLITE_DB_PATH=${SQLITE_DB_PATH} \
     RELOAD_WEBAPP=${RELOAD_WEBAPP} \
     SECRET_KEY=${SECRET_KEY} \
     ORS_API_ENDPOINT=${ORS_API_ENDPOINT} \
-    ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    ALLOWED_ORIGINS=${ALLOWED_ORIGINS} \
+    FILE_VERSION_CONSTRAINTS=${FILE_VERSION_CONSTRAINTS}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git gcc g++ git sqlite3 musl-dev \
+    git gcc g++ git sqlite3 musl-dev curl \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PIP_DEFAULT_TIMEOUT=100 \
@@ -25,7 +27,7 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
 
 RUN mkdir /app
 COPY drop.db /app/
-RUN pip install git+https://github.com/itissid/drop_webdemo.git@${DEPLOY_TAG}
+RUN pip install herenow-demo==${DEPLOY_TAG}
 
 EXPOSE 8000
 WORKDIR /app

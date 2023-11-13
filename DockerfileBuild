@@ -41,6 +41,7 @@ COPY ${HERENOW_DEMO_DIR}/poetry.lock /app/
 COPY ${HERENOW_DEMO_DIR}/src /app/src
 
 RUN chmod +x /app/src/${HERENOW_DEMO_DIR}/configure_demo.py
+# Updates the version of backend in the demo app
 RUN python /app/src/${HERENOW_DEMO_DIR}/configure_demo.py --backend-dist-dir /backend/dist --app-dir /app
 
 RUN touch README.md
@@ -48,7 +49,31 @@ COPY drop.db /app/
 RUN poetry check
 RUN poetry build
 RUN pip install /app/dist/herenow_demo-*.whl
-# TODO: export using poetry from docker container?
 
 # just to test
-EXPOSE 8000 
+FROM app-builder as app-tester
+EXPOSE 8000
+
+ARG SQLITE_DB_PATH
+ARG RELOAD_WEBAPP
+ARG SECRET_KEY
+ARG ORS_API_ENDPOINT
+ARG ALLOWED_ORIGINS
+ARG FILE_VERSION_CONSTRAINTS
+
+ENV SQLITE_DB_PATH=${SQLITE_DB_PATH} \
+    RELOAD_WEBAPP=${RELOAD_WEBAPP} \
+    SECRET_KEY=${SECRET_KEY} \
+    ORS_API_ENDPOINT=${ORS_API_ENDPOINT} \
+    ALLOWED_ORIGINS=${ALLOWED_ORIGINS} \
+    FILE_VERSION_CONSTRAINTS=${FILE_VERSION_CONSTRAINTS}
+
+
+EXPOSE 8000
+WORKDIR /app
+
+ENTRYPOINT ["gunicorn", "herenow_demo.main:app"]
+CMD ["--bind", "0.0.0.0:8000", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker"]
+
+# TODO We now run the part that can publish the version in the app;
+# This process is manual right now.

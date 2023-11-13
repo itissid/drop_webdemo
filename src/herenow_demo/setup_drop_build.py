@@ -116,28 +116,6 @@ def clone_or_copy_project_with_ignore(
         shutil.copytree(local_dir, dest_dir, ignore=ignore_function)
 
 
-# Function to update pyproject.toml to find the backend.
-def update_pyproject_toml(demo_project_dir):
-    toml_file = os.path.join(demo_project_dir, "pyproject.toml")
-
-    config_parser = ConfigParser()
-
-    config_parser.read(toml_file)
-
-    # Update the dependency path for 'drop'
-
-    config_parser.set(
-        "tool.poetry.group.backend.dependencies",
-        "drop",
-        '{path = "/backend/", develop = true}',
-    )
-
-    # Write the changes back to pyproject.toml
-
-    with open(toml_file, "w", encoding="utf-8") as f:
-        config_parser.write(f)
-
-
 def update_app_dependency(app_project_dir, backend_version):
     app_toml_file = os.path.join(app_project_dir, "pyproject.toml")
 
@@ -145,16 +123,16 @@ def update_app_dependency(app_project_dir, backend_version):
     backend_wheel_filename = f"drop_backend-{backend_version}-py3-none-any.whl"
     backend_wheel_path = f"/backend/dist/{backend_wheel_filename}"
 
-    with open(app_toml_file, 'r', encoding='utf-8') as f:
+    with open(app_toml_file, "r", encoding="utf-8") as f:
         data = tomlkit.parse(f.read())
 
     # Update the dependency to point to the wheel file within the Docker container
-    data['tool']['poetry']['dependencies']['drop-backend'] = {
+    data["tool"]["poetry"]["dependencies"]["drop-backend"] = {
         "file": backend_wheel_path
     }
 
     # Write the updated data back to pyproject.toml
-    with open(app_toml_file, 'w', encoding='utf-8') as f:
+    with open(app_toml_file, "w", encoding="utf-8") as f:
         f.write(tomlkit.dumps(data))
 
 
@@ -188,6 +166,10 @@ def update_backend_version(backend_project_dir, version_part):
     return new_version
 
 
+# Run before building the docker images that are meant to test the containers locally before pushing to docker hub.
+# Copies code from both dir into a temp dir.
+# Updates the backend version to an alpha version.
+# Updates the pyproject.toml file in the herenow_demo project to point to the backend wheel file that will be built from that alpha version.
 def main():
     args = parser.parse_args()
 
@@ -234,9 +216,7 @@ def main():
     run_poetry_commands(backend_temp_dir)
 
     if args.update_backend_version:
-        backend_version = update_backend_version(
-            backend_temp_dir, args.bump_version
-        )
+        backend_version = update_backend_version(backend_temp_dir, args.bump_version)
         backend_wheel_filename = f"drop_backend-{backend_version}-py3-none-any.whl"  # Construct the expected wheel filename
         backend_wheel_path = os.path.join(
             temp_dir, local_dropbackend_dir, "dist", backend_wheel_filename

@@ -70,14 +70,14 @@ Iteration Loop(`code=>build=>deploy`):
 3. Use a second docker container to install these builds and deploy!
 
 ## Docker 1(DockerfileBuild): Tests if the wheels can be built and installed using pip:
-0. Write code, prune unwanted deps in drop_backend.
+0. Write code, test, once done prune unwanted deps in `drop_backend` from its pyproject.toml.
  -  Run build.py to copy the code for docker build to find in its context:
  ```
- python build.py --pot-source=local --demo-source=local --pot-dir=/Users/sid/workspace/drop/ --demo-dir=/Users/sid/workspace/herenow_demo/
+ python -m herenow_drop.configure_demo --pot-source=local --demo-source=local --pot-dir=/Users/sid/workspace/drop/ --demo-dir=/Users/sid/workspace/herenow_demo/
  ```
- > This creates a sandbox where the code for both projects is copied and then in that sandbox bumps the major/minor/patch version in pyproject.toml in `drop_backend` example `x.y.`z becomes alpha `x.y.(z+1)-alpha`
+ > This creates a sandbox where the code for both projects is copied and then in that sandbox the script bumps the major/minor/patch version in pyproject.toml in ``drop_backend`` example `x.y.z` becomes alpha `x.y.(z+1)-alpha`. This will be useful later.
 
-2. run `docker build ...` like so:
+1. Run docker build to build the `drop_backend` project like so:
 ```
 docker build --target backend-builder \
 --build-arg DROP_BACKEND_DIR=drop_PoT \
@@ -85,73 +85,98 @@ docker build --target backend-builder \
 -t backend-image -f DockerfileBuild /tmp/subdir
 ```
 
-- 2.1. Log into docker: `docker run -p 8000:8000 -it --entrypoint /bin/bash herenow_demo`
-- 2.2. Fire up the python interpreter and try `import drop_backend` and look around if everything is fine.
+- 1.1. Log into docker: `docker run -p 8000:8000 -it --entrypoint /bin/bash backend-image`
+- 1.2 look in /backend/dist and look at the version in wheel and pyproject.toml. They should match and be incremented over the source on your local host. You can also try importing it in the python interpreter after `pip install dist/*.whl` to make sure it works.
 
-- 2.3. Succeed? No -> Go back to 1 and repeat.
->  The configure_demo.py script runs and fills in the name of the built wheel of drop_backend in the pyproject.toml of herenow_demo. This is needed because the wheel name is not trivial to know until the wheel is built.
-- 2.5 Now run the remaining docker build command:
+3. Succeed? No -> Go back to step 0 and repeat.
+4. Build the app image:
+- Copy the database to /tmp/subdir/drop.db
+- Now make changes to the herenow_demo app. Once done run the remaining docker build command:
 ```
 docker build --target app-builder \
---build-arg DROP_BACKEND_DIR=drop_PoT
+--build-arg DROP_BACKEND_DIR=drop_PoT \
 --build-arg HERENOW_DEMO_DIR=herenow_demo  \
--t app-image -f DockerfileBuild
+-t app-image \
+-f DockerfileBuild \
 /tmp/subdir
 ```
-This will create the wheel of herenow_demo and install it in the docker container.
+- 4.1. It runs the configure_demo.py script runs and fills in the name of the built wheel of `drop_backend` in the pyproject.toml of `herenow_demo`. This is needed because the wheel name is not trivial to know until the wheel is built.
+- 4.2. It will create the wheel of herenow_demo and install it in the docker container.
 
-- 2.4. Upload drop_backend to pypi add dependency to herenow_demo. Make a git commit but don't push yet.
+5. Did you succeed in building the image? 
+- No -> Fix the code and error on local host and go to step 4.
+- Yes -> Go to next step.
 
-3. Fix bugs and prune unwanted deps in herenow_demo. Run build.py. 
-4. Again run docker build command as above.
-5. Did docker build succeed? No -> Go back to 4 and repeat
-6. Log into the docker container:
+6. For the final step to test my web app, I used the local .env file with all the environment variables set that I used for local testing for running the test server in the docker container.
 ```
-docker run -p 8000:8000 -it --entrypoint /bin/bash herenow_demo
+./docker_test_local_server.sh
 ```
-7. Try running the adhoc gunicorn command like so for the final test:
+which will give you a final output command to build the docker image with all the environment variables set: 
 ```
-gunicorn herenow_demo.main:app --bind 0.0.0.0:8000 --workers 1 \
---worker-class uvicorn.workers.UvicornWorker \
--e SQLITE_DB_PATH='sqlite:////app/drop.db' \
--e RELOAD_WEBAPP=True \
--e SECRET_KEY='supersecret-key' \
--e ORS_API_ENDPOINT='http://127.0.0.1:8080/ors/v2/directions/{profile}' \
--e ALLOWED_ORIGINS='http://127.0.0.1:8000,http://localhost:8000'
+docker build --target app-tester -t local-herenow-demo-test -f DockerfileBuild  --build-arg ALLOWED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000 --build-arg SQLITE_DB_PATH=sqlite:////Users/sid/workspace/drop/drop.db --build-arg RELOAD_WEBAPP=True --build-arg SECRET_KEY=supercalifragilisticexpialidocious-key --build-arg ORS_API_ENDPOINT=http://127.0.0.1:8080/ors/v2/directions/{profile} --build-arg FILE_VERSION_CONSTRAINTS='{"hobokengirl_com_hoboken_jersey_city_events_november_10_2023_20231110_065435_postprocessed": ["v1"],"hobokengirl_com_diwali_events_hudson_county_2023_20231110_065438_postprocessed": ["v1"]}'  --build-arg DROP_BACKEND_DIR=drop_PoT  --build-arg HERENOW_DEMO_DIR=herenow_demo /tmp/subdir
 ```
+7. Run the container:
+```
+docker run -network=herenow-demo -p 8000:8000 -d local-herenow-demo-test
+```
+Tail the logs to see the server running:
+```
+ docker logs -f -t herenow-demo
+```
+
+8. Browse to http://localhost:8000/presence/where to check.
 
 ## Check in the tags, preprep for docker build
-1. Now use the tag from last step for both the projects.
->  Change the pyproject.toml for herenow_demo to use the tag for dependency of drop_backend.
-3. Build and push both to pypi and git.
-4. Make any changes to database necessary. 
+Now use the tag from last step for both the projects. 
+1. The tag for `drop_backend` is likely:
+```
+sid@Sids-MacBook-Pro:~/workspace/herenow_demo$ docker run --rm app-image  bash -c "cat /backend/pyproject.toml|grep -C2 drop_backend"
+
+[tool.poetry]
+name = "drop_backend"
+version = "1.0.7-alpha" ------------------------------> This is the alpha version tag.
+description = "API and Command line tools for building drop"
+authors = ["Sid <itissid@gmail.com>"]
+packages = [{ include = "drop_backend", from = "src" }]
+```
+2. Add this tag to your **local** drop_backend's pyproject.toml `version`. Do a `poetry update` and `poetry build` to make sure the wheel is built locally. 
+3. Now publish publish the wheel to pypi using `poetry publish`.
+
+Use the alpha version of the wheel you just pushed for the next step. Note if you did every thing right the local dist/ should have the same file as one on docker and on pypi:
+```
+sid@Sids-MacBook-Pro:~/workspace/herenow_demo$ docker run --rm app-image  bash -c "cat pyproject.toml|grep drop_backend"
+file = "/backend/dist/drop_backend-1.0.7a0-py3-none-any.whl"
+```
+4. Now use 1.0.7a0 built above and add this to the pyproject.toml of `herenow_demo` and do a `poetry update` and `poetry build` to make sure the wheel is built locally. You can also bump the version of `herenow_demo` itself.
+5. Build `herenow_demo` using `poetry build` and push the wheel to pypi using `poetry publish` 
+6. Lastly add tags for these versions to git repos of both the projects and push them to github.
+
 
 ## Docker 2(DockerfileDeploy): This will be the container that will host the app and the SQLite DB.
-0. Build the DockerfileDeploy.
+Building the app image that will be deployed on the k8s cluster is very similar to the last step for the above local build 
+1. Assuming you have updated the drop_backend version in herenow demo and published the alpha version to pypi, you can build the app image:
 ```
-docker build \
-  --build-arg SQLITE_DB_PATH="sqlite:////app/drop.db" \
-  --build-arg RELOAD_WEBAPP="True" \
-  --build-arg SECRET_KEY="somthingsupersecret-key" \
-  --build-arg ORS_API_ENDPOINT="http://127.0.0.1:8080/ors/v2/directions/{profile}" \
-  --build-arg ALLOWED_ORIGINS="http://127.0.0.1:8000,http://localhost:8000" \
-  -t herenow_demo_deploy .
+./docker_test_before_deploy.sh --build-arg DEPLOY_TAG=1.1.0a0
+
+$ docker build --target base -t pre-deploy-herenow-demo -f DockerfileDeploy  --build-arg ALLOWED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000 --build-arg SQLITE_DB_PATH=sqlite:////Users/sid/workspace/drop/drop.db --build-arg RELOAD_WEBAPP=True --build-arg SECRET_KEY=supercalifragilisticexpialidocious-key --build-arg ORS_API_ENDPOINT=http://127.0.0.1:8080/ors/v2/directions/{profile} --build-arg FILE_VERSION_CONSTRAINTS='{"hobokengirl_com_hoboken_jersey_city_events_november_10_2023_20231110_065435_postprocessed": ["v1"],"hobokengirl_com_diwali_events_hudson_county_2023_20231110_065438_postprocessed": ["v1"]}' --build-arg DEPLOY_TAG=1.1.0a0 .
+```
+
+Firing this command will give you a image with an image with the server you can test one last time before deploying:
 
 ```
-1. Run the container:
-```
-docker run -p 8000:8000 -d herenow_demo_deploy
+docker run -p 8000:8000 -d pre-deploy-herenow-demo
 ```
 2. Check on the browser one last time!
 3. Now that both the deps are in the container, push to registry.
 
 ## Next(Deploy docker to cloud)
-TODO
+Once this ran I deployed it to a "small" k8s cluster on Digital Ocean in two steps(my key critera was scale the app to 3 nodes in case of a spike, in case of a crash recover, and portability to any infra). The notes for that are in my openrouteservice repo that I forked.
 
 # Notes
 While building the above i realized that I am actually doing a mini release strategy. Something that github or gitlab can probably help me
 do, were this to ever become a product.
 
+Another cool idea is to use something like ngrok to expose the local server to the internet and then use that to test the app and show it to someone.
 
 
 
