@@ -1,5 +1,5 @@
 # What is this [demo](http://drophere.me)?
-The demo is a PoC of productization to explore urban going ons and how to present them in an almost meditative manner. It is location and time centric: You can find the things happening around you now or later. I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building it.
+The demo is a PoC of productization to explore and travel in urban going ons and how to present them in an almost meditative in the moment manner. It is location and time centric: You can find the things happening around you now or later. I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building it.
 
 The REST routes of the website encapsulate the idea that we should focus on the now first. Everything else is later and takes you away from the now.
 
