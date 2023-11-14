@@ -1,5 +1,5 @@
 # What is this [demo](http://drophere.me)?
-The demo is a PoC of productization of being *here, in The moment,* and conscious urban exploration. I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building it.
+The demo is a PoC of productization of being *here, in The moment*, and conscious urban exploration. I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building it.
 
 The REST routes of the website encapsulate a conscious disposition of Time and Space I wanted to capture: Here and Now(or Later).
 
