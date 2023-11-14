@@ -8,7 +8,7 @@ The REST routes of the website encapsulate the idea that we should focus on the 
 [/presence/where](http://drophere.me/presence/where)
 Plant a pin *Here* :)
 
-### A Pin is planted *Here* and thus its where you are.
+### A Pin is planted *here* and thus its where you are.
 
 You are now dropped into the *Now* screen, the route is: [/presence/here/?when=now](http://drophere.me/presence/here/?when=now&lat=40.74816730666263&long=-74.04544830322267).
 
