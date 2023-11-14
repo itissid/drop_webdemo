@@ -38,8 +38,9 @@ Awareness and being conscious of this moment are two ideas close to my heart. I 
 - The API and Data pipes that uses Smarts(OpenAI), OpenRouteService, FastAPI all in Python; It scrapes, augments and indexes the data into a DB (in Sqlite!).
 The last two bits live in another repo [here](http://github.com/itissid/Drop-PoT.git)
 
-# What it looks like?
-(I am about to deploy the docker to the cloud, but here are some screenshots from the local docker container to explain the idea)
+# Demo navigation
+~(I am about to deploy the docker to the cloud, but here are some screenshots from the local docker container to explain the idea)~
+The site is now [live](drophere.co)
 > *Landing Page: Drop a pin within the area(no location permissions requested)*
 ![Entry Point](./docs/EntryPointSmall.jpg)
 
