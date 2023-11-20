@@ -111,7 +111,7 @@ docker build --target app-builder \
 - No -> Fix the code and error on local host and go to step 4.
 - Yes -> Go to next step.
 
-6. For the final step to test my web app, I used the local .`env.local` file with all the environment variables set that I used for local testing for running the test server in the docker container.
+6. For the final step to test my web app, I used the local .`env.local` file with all the environment variables set that I used for local testing for running the test server in the docker container. Modify it as needed and run:
 ```
 ./docker_test_local_dev.sh
 ```
@@ -129,17 +129,17 @@ docker build --target app-tester -t local-herenow-demo-test \
 --build-arg HERENOW_DEMO_DIR=herenow_demo \
 /tmp/subdir
 ```
-The key is to note the args for ORS API and SQLITE DB path which are different. 
+The key is to note the args for ORS API and SQLITE DB path which are different from `.env`. The file_version_constraints will also change from build to build.
 
 7. Run the container to start the local server:
 ```
-docker run -network=herenow-demo -p 8000:8000 -d local-herenow-demo-test
+docker run --network=herenow-demo -p 8000:8000 -d local-herenow-demo-test
 ```
 Note the network name was created so that the webapp can talk to the ORS container that might be running separately.
 
 Tail the logs to see the server running:
 ```
- docker logs -f -t herenow-demo
+ docker logs -f -t <CONTAINER_NAME>
 ```
 
 8. Browse to http://localhost:8000/presence/where to check.
@@ -165,20 +165,23 @@ Use the alpha version of the wheel you just pushed for the next step. Note if yo
 sid@Sids-MacBook-Pro:~/workspace/herenow_demo$ docker run --rm app-image  bash -c "cat pyproject.toml|grep drop_backend"
 file = "/backend/dist/drop_backend-1.0.7a0-py3-none-any.whl"
 ```
-4. Now use 1.0.7a0 built above and add this to the pyproject.toml of `herenow_demo` and do a `poetry update` and `poetry build` to make sure the wheel is built locally. You can also bump the version of `herenow_demo` itself.
-5. Build `herenow_demo` using `poetry build` and push the wheel to pypi using `poetry publish` 
+4. Now use this build, `1.0.7a0` is the example, built above and add this to the pyproject.toml of `herenow_demo` and do a `poetry update` and `poetry build` to make sure the wheel is built locally. You should bump the version of `herenow_demo` itself.
+5. Build `herenow_demo` using `poetry build` and push the wheel to pypi using `poetry publish`.
 6. Lastly add tags for these versions to git repos of both the projects and push them to github.
 
 
 ## Docker 2(DockerfileDeploy): This will be the container that will host the app and the SQLite DB.
 Building the app image that will be deployed on the k8s cluster is very similar to the last step for the above local build 
-1. Assuming you have updated the drop_backend version in herenow demo and published the alpha version to pypi, you can build the app image:
+0. cd into this project directory and copy over `drop.db` to this directory
+1. Assuming you have updated the `drop_backend` version in herenow demo and published the alpha version to pypi, you can build the app image:
 ```
 ./docker_test_before_deploy.sh --build-arg DEPLOY_TAG=1.1.0a0
+ 
+This give the command:
 
 $ docker build --target base -t pre-deploy-herenow-demo -f DockerfileDeploy \
 --build-arg ALLOWED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000 \
---build-arg SQLITE_DB_PATH=sqlite:////Users/sid/workspace/drop/drop.db \
+--build-arg SQLITE_DB_PATH=sqlite:////app/drop.db \
 --build-arg RELOAD_WEBAPP=True \
 --build-arg SECRET_KEY=secret-key \
 --build-arg ORS_API_ENDPOINT=http://orsapp:8080/ors/v2/directions/{profile} \ 
@@ -194,7 +197,7 @@ Note the DEPLOY_TAG is the version of the herenow_demo package in pypi
 Firing this command will give you a image with an image with the server you can test one last time before deploying:
 
 ```
-docker run -p 8000:8000 -d pre-deploy-herenow-demo
+docker run --network herenow-demo -p 8000:8000 -d pre-deploy-herenow-demo
 ```
 2. Check on the browser one last time!
 3. Now that both the deps are in the container, push to registry.

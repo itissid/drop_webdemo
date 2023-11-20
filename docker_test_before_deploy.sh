@@ -10,5 +10,5 @@ while IFS= read -r line; do
     BUILD_ARGS+=" --build-arg $key=$value"
 done < .env.preprod
 
-echo "docker build --target base -t pre-deply-herenow-demo -f DockerfileDeploy $BUILD_ARGS ${ADDITIONAL_ARGS} ."
+echo "docker build --target base -t pre-deploy-herenow-demo -f DockerfileDeploy $BUILD_ARGS ${ADDITIONAL_ARGS} ."
 
