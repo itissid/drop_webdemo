@@ -3,7 +3,7 @@ The demo is a PoC of productization to explore and travel in urban going ons and
 The REST routes of the website encapsulate the idea that we should focus on the now first. Everything else is later and takes you away from the now.
 
 I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building the backend as well as experimented extensively with GPT tools to help me write the code for it.
-
+The backend for this tech is [jere](http://github.com/itissid/Drop-PoT.git)
 
 ## Here == Location and Now/Later == Time
 #### You always start with the *Where*:
