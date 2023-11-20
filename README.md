@@ -64,16 +64,18 @@ that needed rust/c++ etc. Often there were errors and it took a fair bit of time
 
 Iteration Loop(`code=>build=>deploy`): 
 1. Build the wheel of the `drop_backed` project. Update it in the `herenow_demo`. Both of these should be installable via pip.
-> A thing to note is that `poetry build`'s wheels don't exclude any deps from the pyproject.toml as explained [here](https://github.com/python-poetry/poetry/issues/2567#issuecomment-1100038202), but we can use `extras` in poetry and set the optional=true on them so that later pip does not install them unless we ask.
+> A thing to note about moving a dep to `tool.poetry.dependencies.dev` is that `poetry build`'s wheels don't exclude any deps from the pyproject.toml in whatever section it is as explained [here](https://github.com/python-poetry/poetry/issues/2567#issuecomment-1100038202), but we can use `extras` in poetry and set the optional=true on them so that later pip does not install them unless we ask.
 
-2. Once tested(from local docker), the builds will be tagged. We can copy them from the containers and push to pypi.
-3. Use a second docker container to install these builds and deploy!
+2. Once tested(from local docker), the builds will be tagged. We can copy them from the containers and push to pypi or we can just build and push wheels from the locally tested code.
+3. Then Use a second docker container to install these built artifacts in a docker container
+4. Push the docker container to a registry where it can be 
+deployed to a k8s/ec2/gws etc cluster.
 
 ## Docker 1(DockerfileBuild): Tests if the wheels can be built and installed using pip:
 0. Write code, test, once done prune unwanted deps in `drop_backend` from its pyproject.toml.
- -  Run build.py to copy the code for docker build to find in its context:
+ -  Run setup_drop_build to copy the code for docker build to find in its context:
  ```
- python -m herenow_drop.configure_demo --pot-source=local --demo-source=local --pot-dir=/Users/sid/workspace/drop/ --demo-dir=/Users/sid/workspace/herenow_demo/
+ python -m herenow_drop.setup_drop_build --pot-source=local --demo-source=local --pot-dir=/Users/sid/workspace/drop/ --demo-dir=/Users/sid/workspace/herenow_demo/
  ```
  > This creates a sandbox where the code for both projects is copied and then in that sandbox the script bumps the major/minor/patch version in pyproject.toml in ``drop_backend`` example `x.y.z` becomes alpha `x.y.(z+1)-alpha`. This will be useful later.
 
@@ -86,11 +88,11 @@ docker build --target backend-builder \
 ```
 
 - 1.1. Log into docker: `docker run -p 8000:8000 -it --entrypoint /bin/bash backend-image`
-- 1.2 look in /backend/dist and look at the version in wheel and pyproject.toml. They should match and be incremented over the source on your local host. You can also try importing it in the python interpreter after `pip install dist/*.whl` to make sure it works.
+- 1.2 look in /backend/dist and look at the version in wheel and pyproject.toml. They should match and be incremented over the source on your local host. You can also try importing it in the python interpreter after `pip install dist/*.whl` to make sure import works. We test this in the next step.
 
 3. Succeed? No -> Go back to step 0 and repeat.
 4. Build the app image:
-- Copy the database to /tmp/subdir/drop.db
+- Copy the database to `/tmp/subdir/drop.db`
 - Now make changes to the herenow_demo app. Once done run the remaining docker build command:
 ```
 docker build --target app-builder \
@@ -100,25 +102,41 @@ docker build --target app-builder \
 -f DockerfileBuild \
 /tmp/subdir
 ```
-- 4.1. It runs the configure_demo.py script runs and fills in the name of the built wheel of `drop_backend` in the pyproject.toml of `herenow_demo`. This is needed because the wheel name is not trivial to know until the wheel is built.
+> Tip: When you are coding and testing locally the best way is to uncomment `# drop-backend = { path = "../drop" }` dep and just run uvicorn locally(poetry run herenow_demo.) to test. Just make sure the .env file has the right env vars set. 
+
+- 4.1. Crucially, the `docker build...` above runs the `configure_demo.py` script runs and fills in the name of the built wheel of `drop_backend` in the pyproject.toml of `herenow_demo`. This is needed because the wheel name is not trivial to know until the wheel is built.
 - 4.2. It will create the wheel of herenow_demo and install it in the docker container.
 
 5. Did you succeed in building the image? 
 - No -> Fix the code and error on local host and go to step 4.
 - Yes -> Go to next step.
 
-6. For the final step to test my web app, I used the local .env file with all the environment variables set that I used for local testing for running the test server in the docker container.
+6. For the final step to test my web app, I used the local .`env.local` file with all the environment variables set that I used for local testing for running the test server in the docker container.
 ```
-./docker_test_local_server.sh
+./docker_test_local_dev.sh
 ```
 which will give you a final output command to build the docker image with all the environment variables set: 
 ```
-docker build --target app-tester -t local-herenow-demo-test -f DockerfileBuild  --build-arg ALLOWED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000 --build-arg SQLITE_DB_PATH=sqlite:////Users/sid/workspace/drop/drop.db --build-arg RELOAD_WEBAPP=True --build-arg SECRET_KEY=supercalifragilisticexpialidocious-key --build-arg ORS_API_ENDPOINT=http://127.0.0.1:8080/ors/v2/directions/{profile} --build-arg FILE_VERSION_CONSTRAINTS='{"hobokengirl_com_hoboken_jersey_city_events_november_10_2023_20231110_065435_postprocessed": ["v1"],"hobokengirl_com_diwali_events_hudson_county_2023_20231110_065438_postprocessed": ["v1"]}'  --build-arg DROP_BACKEND_DIR=drop_PoT  --build-arg HERENOW_DEMO_DIR=herenow_demo /tmp/subdir
+docker build --target app-tester -t local-herenow-demo-test \
+-f DockerfileBuild  \
+--build-arg ALLOWED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000 \
+--build-arg SQLITE_DB_PATH=sqlite:////app/drop.db \
+--build-arg RELOAD_WEBAPP=True \
+--build-arg SECRET_KEY=secret-key \
+--build-arg ORS_API_ENDPOINT=http://ors-app:8080/ors/v2/directions/{profile} \
+--build-arg FILE_VERSION_CONSTRAINTS='{"hobokengirl_com_hoboken_jersey_city_events_november_10_2023_20231110_065435_postprocessed": ["v1"],"hobokengirl_com_diwali_events_hudson_county_2023_20231110_065438_postprocessed": ["v1"]}'  \
+--build-arg DROP_BACKEND_DIR=drop_PoT  \
+--build-arg HERENOW_DEMO_DIR=herenow_demo \
+/tmp/subdir
 ```
-7. Run the container:
+The key is to note the args for ORS API and SQLITE DB path which are different. 
+
+7. Run the container to start the local server:
 ```
 docker run -network=herenow-demo -p 8000:8000 -d local-herenow-demo-test
 ```
+Note the network name was created so that the webapp can talk to the ORS container that might be running separately.
+
 Tail the logs to see the server running:
 ```
  docker logs -f -t herenow-demo
@@ -158,8 +176,20 @@ Building the app image that will be deployed on the k8s cluster is very similar 
 ```
 ./docker_test_before_deploy.sh --build-arg DEPLOY_TAG=1.1.0a0
 
-$ docker build --target base -t pre-deploy-herenow-demo -f DockerfileDeploy  --build-arg ALLOWED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000 --build-arg SQLITE_DB_PATH=sqlite:////Users/sid/workspace/drop/drop.db --build-arg RELOAD_WEBAPP=True --build-arg SECRET_KEY=supercalifragilisticexpialidocious-key --build-arg ORS_API_ENDPOINT=http://127.0.0.1:8080/ors/v2/directions/{profile} --build-arg FILE_VERSION_CONSTRAINTS='{"hobokengirl_com_hoboken_jersey_city_events_november_10_2023_20231110_065435_postprocessed": ["v1"],"hobokengirl_com_diwali_events_hudson_county_2023_20231110_065438_postprocessed": ["v1"]}' --build-arg DEPLOY_TAG=1.1.0a0 .
+$ docker build --target base -t pre-deploy-herenow-demo -f DockerfileDeploy \
+--build-arg ALLOWED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000 \
+--build-arg SQLITE_DB_PATH=sqlite:////Users/sid/workspace/drop/drop.db \
+--build-arg RELOAD_WEBAPP=True \
+--build-arg SECRET_KEY=secret-key \
+--build-arg ORS_API_ENDPOINT=http://orsapp:8080/ors/v2/directions/{profile} \ 
+--build-arg
+FILE_VERSION_CONSTRAINTS='{"hobokengirl_com_hoboken_jersey_city_events_november_10_2023_20231110_065435_postprocessed":
+["v1"],"hobokengirl_com_diwali_events_hudson_county_2023_20231110_065438_postprocessed":
+["v1"]}' 
+--build-arg DEPLOY_TAG=1.1.0a0 .
 ```
+
+Note the DEPLOY_TAG is the version of the herenow_demo package in pypi
 
 Firing this command will give you a image with an image with the server you can test one last time before deploying:
 

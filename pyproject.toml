@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "herenow_demo"
-version = "1.1.0-alpha"
+version = "1.1.1"
 description = "Demo of Approximate Retrieval capability of LLMs appplied to build a product for Mindful Exploration of Urban Events."
 authors = ["Sid <itissid@gmail.com>"]
 license = "CC BY NC"
