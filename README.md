@@ -1,7 +1,7 @@
 # What is this [demo](http://drophere.me)?
 When we Explore and Travel and search for something around us, the Search experience on Yelp and Google dissapoints me. I find that these engines are poor for what you *can do now* vs later and cannot personalize it based on your Context(preferences, weather etc).
 
-Drop is location and time aware: You can narrow the things happening around you Now or Later and it can take Contextual cues like Weather, Distance and present search results in a more aware almost meditative manner.
+Drop is location and time aware: You can narrow the things happening around you Now(vs Later or already occured events) and it can take Contextual cues like Weather, Distance and present search results in a more aware(almost meditative) manner.
 
 The REST routes of the website encapsulate the idea that we should focus on the now first. Everything else is later and takes you away from the now.
 
