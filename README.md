@@ -1,5 +1,8 @@
 # What is this [demo](http://drophere.me)?
-The demo is a PoC of productization to explore and travel in urban going ons and how to present them in an almost meditative in the moment manner. It is location and time centric: You can find the things happening around you now or later. 
+When we Explore and Travel and search for something around us, the Search experience on Yelp and Google dissapoints me. I find that these engines are poor for what you *can do now* vs later and cannot personalize it based on your Context(preferences, weather etc).
+
+Drop is location and time aware: You can narrow the things happening around you Now or Later and it can take Contextual cues like Weather, Distance and present search results in a more aware almost meditative manner.
+
 The REST routes of the website encapsulate the idea that we should focus on the now first. Everything else is later and takes you away from the now.
 
 I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building the backend as well as experimented extensively with GPT tools to help me write the code for it.
