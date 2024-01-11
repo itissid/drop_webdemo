@@ -28,11 +28,10 @@ If you just want Zen with immersive sound and visuals, toggle the screen with th
 I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building the backend as well as experimented extensively with GPT tools to help me write the code for it.
 The backend for this tech is [here](http://github.com/itissid/Drop-PoT.git)
 ---- 
-## How is this about travelling?
-I consider myself a weekend traveller most of times and the Site has exactly that content. I go to explore the city and people around me on those days. This is a tool for a usecase of 1(at the moment). I hope it can grow.
 
 # Who am I?
 Awareness and being conscious of this moment are two ideas close to my heart. I also love to travel but one can also be a "traveller" within their city(One might say we all travel on the weekend) exploring places big and small. I live in Hoboken, NJ so the demo is only content from there.
+I consider myself a weekend traveller most of times and the Site has exactly that content. I go to explore the city and people around me on those days. This is a tool for a usecase of 1(at the moment). I hope it can grow.
 
 # Tech stack
 - This repo is just the front end(FastAPI, Jinja, Bootstap CSS, Swiper.js).
