@@ -3,31 +3,11 @@
 # What is this [demo](http://drophere.me)?
 When we Explore and Travel and search for something around us, the Search experience on Yelp and Google dissapoints me. I find that these engines are poor for what you *can do now* vs later and cannot personalize it based on your Context(preferences, weather etc).
 
-Drop is location and time aware: You search with a Pin and You can narrow the things happening around you Now(vs Later or already occured events) and it can(extension to demo) take Contextual cues like Weather, Distance and present search results in a more aware(almost meditative) manner.
+Drop is supposed to be Context(location, time), Preference, Interaction aware: You search with a Pin and You can narrow the things happening around you Now(vs Later or already occured events) and it can(extension to demo) take Contextual cues like Weather, Distance and present search results in a more aware(almost meditative) manner. The idea is that the more you interact with it the more it ranks places you *might* like higher.
 
 I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building the backend as well as experimented extensively with GPT tools to help me write the code for it. The backend for this tech is [here](http://github.com/itissid/Drop-PoT.git)
 
 The REST routes of the website encapsulate the idea that we should focus on the now first. Everything else is later and takes you away from the now:
-
-## Here == Location and Now/Later == Time
-#### You always start with the *Where*:
-[/presence/where](http://drophere.me/presence/where)
-Plant a pin *Here* :)
-
-### A Pin is planted *here* and thus its where you are.
-
-You are now dropped into the *Now* screen, the route is: [/presence/here/?when=now](http://drophere.me/presence/here/?when=now&lat=40.74816730666263&long=-74.04544830322267).
-
-The UI has catagorized events happening *Now*(technically in < 1 hour or ongoing) around you.
-
-### But we are also explorers, A Button press takes you to the *Later*: 
-[/presence/here/?when=later](http://drophere.me/presence/here/?when=later&lat=40.74816730666263&long=-74.04544830322267)
-
-*Later* UI has events technically happening > 1 hour from now or not on going.
-
-### Not do anything, just relax?
-
-If you just want Zen with immersive sound and visuals, toggle the screen with the button on the top left.
 
 ---- 
 
