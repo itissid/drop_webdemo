@@ -1,7 +1,7 @@
 
 
 # What is this [demo](http://drophere.me)?
-When we Explore and Travel and search for something around us, the Search experience on Yelp and Google dissapoints me. I find that these engines are poor for what you *can do now* vs later and cannot personalize it based on your Context(preferences, weather, heading, location etc).
+When we Explore and Travel and search for something around us, the Search experience on Yelp and Google dissapoints me. Its just feed and I can't really decide if there is something to do now in the moment.
 
 Drop is supposed to be Context(location, time), Preference, Interaction aware: You search with a Pin and You can narrow the things simply by wha's happening around you Now or Later. And it can(extension to demo) take Contextual cues like Weather, Distance and present search results with a mindfulness perspective. 
 
