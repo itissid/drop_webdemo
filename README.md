@@ -1,9 +1,9 @@
 
 
 # What is this [demo](http://drophere.me)?
-When we Explore and Travel and search for something around us, the Search experience on Yelp and Google dissapoints me. Its just feed and I can't really decide if there is something to do now in the moment.
+Drop is an app for mindful travel. When I Travel and search for something around me, the Search experience on Yelp and Google dissapoints me. Its just feed and I can't really decide if there is something to do now in the moment. It wants to upsell things and has no [Theory of Mind](https://en.wikipedia.org/wiki/Theory_of_mind) i.e. now aware of what I am thinking. No way to tell google or yelp what you really want except a search box.
 
-Drop is supposed to be Context(location, time), Preference, Interaction aware: You search with a Pin and You can narrow the things simply by wha's happening around you Now or Later. And it can(extension to demo) take Contextual cues like Weather, Distance and present search results with a mindfulness perspective. 
+Drop is supposed to be Context(location, time), Preference, Interaction aware: You search with a Pin and You can narrow the things simply by what's happening around you Now or Later, That simple. It can(extension to demo) take Contextual cues like Weather, Distance and present search results with a mindfulness perspective.
 
 I have utilized AI (LLMs), OpenRouteService, FastAPI and K8s for building the backend as well as experimented extensively with GPT tools to help me write the code for it. The backend for this tech is [here](http://github.com/itissid/Drop-PoT.git)
 
